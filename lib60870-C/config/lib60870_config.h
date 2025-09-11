@@ -110,4 +110,20 @@
 #define CONFIG_ALLOW_C_TS_NA_1_FOR_CS104 0
 #endif
 
+/**
+ * Enable support for IEC 62351-5 A-profile security layer.
+ *
+ * When set to 1 additional security related code will be
+ * compiled into the library. By default this feature is
+ * disabled to keep the footprint small.
+ */
+#ifndef CONFIG_CS104_APROFILE
+#define CONFIG_CS104_APROFILE 0
+#endif
+
+/* Enable optional AEAD support for the A-profile implementation */
+#ifndef CONFIG_CS104_APROFILE_AEAD
+#define CONFIG_CS104_APROFILE_AEAD 0
+#endif
+
 #endif /* CONFIG_LIB60870_CONFIG_H_ */

@@ -30,6 +30,8 @@
 
 #include "buffer_frame.h"
 #include "cs104_frame.h"
+#include "cs104_security.h"
+#include "aprofile_internal.h"
 #include "cs104_slave.h"
 #include "frame.h"
 #include "hal_socket.h"
@@ -1194,6 +1196,13 @@ struct sCS104_Slave
     MasterConnection
         masterConnections[CONFIG_CS104_MAX_CLIENT_CONNECTIONS]; /**< references to all MasterConnection objects */
 
+#if (CONFIG_CS104_APROFILE == 1)
+    bool securityConfigured;
+    CS104_SecurityConfig securityConfig;
+    CS104_CertConfig certConfig;
+    CS104_RoleConfig roleConfig;
+#endif
+
 #if (CONFIG_USE_SEMAPHORES == 1)
     Semaphore openConnectionsLock;
 #endif
@@ -1296,6 +1305,10 @@ struct sMasterConnection
 
     MessageQueue lowPrioQueue;
     HighPriorityASDUQueue highPrioQueue;
+
+#if (CONFIG_CS104_APROFILE == 1)
+    AProfileContext sec;
+#endif
 
 #if (CONFIG_CS104_SUPPORT_SERVER_MODE_MULTIPLE_REDUNDANCY_GROUPS == 1)
     CS104_RedundancyGroup redundancyGroup;
@@ -1482,6 +1495,10 @@ createSlave(int maxLowPrioQueueSize, int maxHighPrioQueueSize)
 #endif
 
         self->serverSocket = NULL;
+
+#if (CONFIG_CS104_APROFILE == 1)
+        self->securityConfigured = false;
+#endif
 
         self->plugins = NULL;
 
@@ -1772,6 +1789,37 @@ CS104_Slave_setRawMessageHandler(CS104_Slave self, CS104_SlaveRawMessageHandler 
     self->rawMessageHandlerParameter = parameter;
 }
 
+#if (CONFIG_CS104_APROFILE == 1)
+void
+CS104_Slave_setSecurityConfig(CS104_Slave self, const CS104_SecurityConfig* sec,
+                              const CS104_CertConfig* cert, const CS104_RoleConfig* role)
+{
+    self->securityConfigured = true;
+    if (sec)
+        self->securityConfig = *sec;
+    if (cert)
+        self->certConfig = *cert;
+    if (role)
+        self->roleConfig = *role;
+
+    for (int i = 0; i < CONFIG_CS104_MAX_CLIENT_CONNECTIONS; i++)
+    {
+        if (self->masterConnections[i] && self->masterConnections[i]->sec == NULL)
+            self->masterConnections[i]->sec = AProfile_create();
+    }
+}
+#else
+void
+CS104_Slave_setSecurityConfig(CS104_Slave self, const CS104_SecurityConfig* sec,
+                              const CS104_CertConfig* cert, const CS104_RoleConfig* role)
+{
+    (void)self;
+    (void)sec;
+    (void)cert;
+    (void)role;
+}
+#endif
+
 CS104_APCIParameters
 CS104_Slave_getConnectionParameters(CS104_Slave self)
 {
@@ -2016,6 +2064,11 @@ sendASDUInternal(MasterConnection self, CS101_ASDU asdu)
 
             Frame frame = BufferFrame_initialize(&bufferFrame, frameBuffer.msg, IEC60870_5_104_APCI_LENGTH);
             CS101_ASDU_encode(asdu, frame);
+
+            #if (CONFIG_CS104_APROFILE == 1)
+            if (self->sec && AProfile_ready(self->sec))
+                AProfile_wrapOutAsdu(self->sec, (T104Frame)frame);
+            #endif
 
             frameBuffer.msgSize = Frame_getMsgSize(frame);
 
@@ -2882,10 +2935,23 @@ handleMessage(MasterConnection self, uint8_t* buffer, int msgSize)
 
             if (MasterConnection_isActive(self))
             {
+                const uint8_t* asduBuf = buffer + 6;
+                int asduLen = msgSize - 6;
+
+#if (CONFIG_CS104_APROFILE == 1)
+                if (self->sec)
+                {
+                    AProfileKind kind =
+                        AProfile_handleInPdu(self->sec, buffer + 6, msgSize - 6, &asduBuf, &asduLen);
+                    if (kind == APROFILE_CTRL_MSG)
+                        return true;
+                }
+#endif
+
                 struct sCS101_ASDU _asdu;
 
                 CS101_ASDU asdu =
-                    CS101_ASDU_createFromBufferEx(&_asdu, &(self->slave->alParameters), buffer + 6, msgSize - 6);
+                    CS101_ASDU_createFromBufferEx(&_asdu, &(self->slave->alParameters), (uint8_t*)asduBuf, asduLen);
 
                 if (asdu)
                 {
@@ -2930,6 +2996,11 @@ handleMessage(MasterConnection self, uint8_t* buffer, int msgSize)
 
             if (writeToSocket(self, STARTDT_CON_MSG, STARTDT_CON_MSG_SIZE) < 0)
                 return false;
+
+#if (CONFIG_CS104_APROFILE == 1)
+            if (self->sec)
+                AProfile_onStartDT(self->sec);
+#endif
         }
 
         /* Check for STOPDT_ACT message */
@@ -3077,6 +3148,11 @@ MasterConnection_destroy(MasterConnection self)
     {
 
         GLOBAL_FREEMEM(self->sentASDUs);
+
+#if (CONFIG_CS104_APROFILE == 1)
+        if (self->sec)
+            AProfile_destroy(self->sec);
+#endif
 
 #if (CONFIG_USE_SEMAPHORES == 1)
         Semaphore_destroy(self->sentASDUsLock);
@@ -3625,6 +3701,9 @@ MasterConnection_create(CS104_Slave slave)
 #endif
         self->lowPrioQueue = NULL;
         self->highPrioQueue = NULL;
+#if (CONFIG_CS104_APROFILE == 1)
+        self->sec = NULL;
+#endif
     }
 
     return self;
