@@ -32,6 +32,8 @@
 #include <string.h>
 
 #include "cs104_frame.h"
+#include "cs104_security.h"
+#include "aprofile_internal.h"
 #include "hal_socket.h"
 #include "hal_thread.h"
 #include "hal_time.h"
@@ -143,6 +145,12 @@ struct sCS104_Connection
 
     IEC60870_RawMessageHandler rawMessageHandler;
     void* rawMessageHandlerParameter;
+
+#if (CONFIG_CS104_APROFILE == 1)
+    AProfileContext sec;
+    CS104_SecurityEventHandler securityEventHandler;
+    void* securityEventHandlerParameter;
+#endif
 };
 
 static uint8_t STARTDT_ACT_MSG[] = {0x68, 0x04, 0x07, 0x00, 0x00, 0x00};
@@ -239,6 +247,12 @@ createConnection(const char* hostname, int tcpPort)
 
         self->rawMessageHandler = NULL;
         self->rawMessageHandlerParameter = NULL;
+
+#if (CONFIG_CS104_APROFILE == 1)
+        self->sec = NULL;
+        self->securityEventHandler = NULL;
+        self->securityEventHandlerParameter = NULL;
+#endif
 
 #if (CONFIG_USE_SEMAPHORES == 1)
         self->conStateLock = Semaphore_create(1);
@@ -469,6 +483,11 @@ CS104_Connection_destroy(CS104_Connection self)
     if (self->sentASDUs != NULL)
         GLOBAL_FREEMEM(self->sentASDUs);
 
+#if (CONFIG_CS104_APROFILE == 1)
+    if (self->sec)
+        AProfile_destroy(self->sec);
+#endif
+
 #if (CONFIG_USE_SEMAPHORES == 1)
     Semaphore_destroy(self->conStateLock);
 #endif
@@ -693,10 +712,24 @@ checkMessage(CS104_Connection self, uint8_t* buffer, int msgSize)
         self->receiveCount = (self->receiveCount + 1) % 32768;
         self->unconfirmedReceivedIMessages++;
 
+        const uint8_t* asduBuffer = buffer + 6;
+        int asduLength = msgSize - 6;
+
+#if (CONFIG_CS104_APROFILE == 1)
+        if (self->sec)
+        {
+            AProfileKind kind =
+                AProfile_handleInPdu(self->sec, buffer + 6, msgSize - 6, &asduBuffer, &asduLength);
+            if (kind == APROFILE_CTRL_MSG)
+                goto exit_function;
+        }
+#endif
+
         struct sCS101_ASDU _asdu;
 
-        CS101_ASDU asdu = CS101_ASDU_createFromBufferEx(&_asdu, (CS101_AppLayerParameters) & (self->alParameters),
-                                                        buffer + 6, msgSize - 6);
+        CS101_ASDU asdu = CS101_ASDU_createFromBufferEx(&_asdu,
+                                                        (CS101_AppLayerParameters) & (self->alParameters),
+                                                        (uint8_t*)asduBuffer, asduLength);
 
         if (asdu)
         {
@@ -740,6 +773,11 @@ checkMessage(CS104_Connection self, uint8_t* buffer, int msgSize)
             DEBUG_PRINT("Received STARTDT_CON\n");
 
             self->conState = STATE_ACTIVE;
+
+#if (CONFIG_CS104_APROFILE == 1)
+            if (self->sec)
+                AProfile_onStartDT(self->sec);
+#endif
         }
         else if (buffer[2] == 0x23)
         { /* STOPDT_CON */
@@ -1186,6 +1224,49 @@ CS104_Connection_setRawMessageHandler(CS104_Connection self, IEC60870_RawMessage
     self->rawMessageHandlerParameter = parameter;
 }
 
+#if (CONFIG_CS104_APROFILE == 1)
+void
+CS104_Connection_setSecurityConfig(CS104_Connection self, const CS104_SecurityConfig* sec,
+                                   const CS104_CertConfig* cert, const CS104_RoleConfig* role)
+{
+    (void)sec;
+    (void)cert;
+    (void)role;
+
+    if (self->sec)
+        AProfile_destroy(self->sec);
+
+    self->sec = AProfile_create();
+}
+
+void
+CS104_Connection_setSecurityEventHandler(CS104_Connection self, CS104_SecurityEventHandler handler,
+                                         void* parameter)
+{
+    self->securityEventHandler = handler;
+    self->securityEventHandlerParameter = parameter;
+}
+#else
+void
+CS104_Connection_setSecurityConfig(CS104_Connection self, const CS104_SecurityConfig* sec,
+                                   const CS104_CertConfig* cert, const CS104_RoleConfig* role)
+{
+    (void)self;
+    (void)sec;
+    (void)cert;
+    (void)role;
+}
+
+void
+CS104_Connection_setSecurityEventHandler(CS104_Connection self, CS104_SecurityEventHandler handler,
+                                         void* parameter)
+{
+    (void)self;
+    (void)handler;
+    (void)parameter;
+}
+#endif
+
 static void
 encodeIdentificationField(CS104_Connection self, Frame frame, TypeID typeId, int vsq, CS101_CauseOfTransmission cot,
                           int ca)
@@ -1291,6 +1372,11 @@ sendASDUInternal(CS104_Connection self, Frame frame)
 
         if (isSentBufferFull(self) == false)
         {
+            #if (CONFIG_CS104_APROFILE == 1)
+            if (self->sec && AProfile_ready(self->sec))
+                AProfile_wrapOutAsdu(self->sec, (T104Frame)frame);
+            #endif
+
             sendIMessageAndUpdateSentASDUs(self, frame);
             retVal = true;
         }

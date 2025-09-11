@@ -11,6 +11,7 @@ endif
 LIB_SOURCE_DIRS += src/iec60870
 LIB_SOURCE_DIRS += src/iec60870/cs101
 LIB_SOURCE_DIRS += src/iec60870/cs104
+LIB_SOURCE_DIRS += src/iec60870/security/62351-5
 LIB_SOURCE_DIRS += src/iec60870/link_layer
 LIB_SOURCE_DIRS += src/iec60870/apl
 
@@ -77,6 +78,7 @@ LIB_API_HEADER_FILES += src/inc/api/cs101_information_objects.h
 LIB_API_HEADER_FILES += src/inc/api/cs101_master.h
 LIB_API_HEADER_FILES += src/inc/api/cs101_slave.h
 LIB_API_HEADER_FILES += src/inc/api/cs104_connection.h
+LIB_API_HEADER_FILES += src/inc/api/cs104_security.h
 LIB_API_HEADER_FILES += src/inc/api/cs104_slave.h
 LIB_API_HEADER_FILES += src/inc/api/iec60870_common.h
 LIB_API_HEADER_FILES += src/inc/api/iec60870_master.h
