@@ -1,0 +1,10 @@
+^C:\USERS\Z005653N\DESKTOP\LIB60870\LIB60870-C\CMAKEFILES\BF9B6C99E7489D1CC38916B5A5E1E8CB\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/z005653n/Desktop/lib60870/lib60870-C -BC:/Users/z005653n/Desktop/lib60870/lib60870-C --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/z005653n/Desktop/lib60870/lib60870-C/lib60870-C.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

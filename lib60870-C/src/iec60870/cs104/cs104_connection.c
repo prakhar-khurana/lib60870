@@ -1225,18 +1225,23 @@ CS104_Connection_setRawMessageHandler(CS104_Connection self, IEC60870_RawMessage
 }
 
 #if (CONFIG_CS104_APROFILE == 1)
+static bool
+cs104Client_sendAsdu(void* connection, CS101_ASDU asdu)
+{
+    return CS104_Connection_sendASDU((CS104_Connection)connection, asdu);
+}
+#endif
+
+#if (CONFIG_CS104_APROFILE == 1)
 void
 CS104_Connection_setSecurityConfig(CS104_Connection self, const CS104_SecurityConfig* sec,
                                    const CS104_CertConfig* cert, const CS104_RoleConfig* role)
 {
-    (void)sec;
-    (void)cert;
-    (void)role;
 
     if (self->sec)
         AProfile_destroy(self->sec);
 
-    self->sec = AProfile_create();
+    self->sec = AProfile_create(self, cs104Client_sendAsdu);
 }
 
 void

@@ -1,4 +1,11 @@
 
+include_directories(
+    ./inc/api
+    ./inc/internal
+    ./hal
+    ./common
+)
+
 set (lib_common_SRCS
 ./file-service/file_server.c
 ./iec60870/apl/cpXXtime2a.c
@@ -12,7 +19,7 @@ set (lib_common_SRCS
 ./iec60870/cs104/cs104_connection.c
 ./iec60870/cs104/cs104_frame.c
 ./iec60870/cs104/cs104_slave.c
-./iec60870/security/62351-5/aprofile_context.c
+./iec60870/security/62351-5/aprofile.c
 ./iec60870/link_layer/buffer_frame.c
 ./iec60870/link_layer/link_layer.c
 ./iec60870/link_layer/serial_transceiver_ft_1_2.c

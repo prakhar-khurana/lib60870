@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\x64\Debug\ZERO_CHECK</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs101_master_balanced\Debug\cs101_master_balanced.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs101_master_unbalanced\Debug\cs101_master_unbalanced.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs101_slave\Debug\cs101_slave.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs101_slave_files\Debug\cs101_slave_files.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs104_client_async\Debug\cs104_client_async.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs104_redundancy_server\Debug\cs104_redundancy_server.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs104_server\Debug\cs104_server.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs104_server_files\Debug\cs104_server_files.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs104_server_no_threads\Debug\cs104_server_no_threads.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\Debug\lib60870.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\multi_client_server\Debug\multi_client_server.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\cs104_client\Debug\simple_client.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\Debug\tests.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\tls_client\Debug\tls_client.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\examples\tls_server\Debug\tls_server.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\z005653n\Desktop\lib60870\lib60870-C\x64\Debug\ALL_BUILD</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles />
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

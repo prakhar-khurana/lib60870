@@ -41,6 +41,8 @@ extern "C" {
  * @{
  */
 
+#define UNUSED_PARAMETER(x) (void)(x)
+
 
 #define IEC_60870_5_104_DEFAULT_PORT 2404
 #define IEC_60870_5_104_DEFAULT_TLS_PORT 19998
@@ -172,7 +174,7 @@ typedef enum {
     C_BO_TA_1 = 64,
     M_EI_NA_1 = 70,
     S_CH_NA_1 = 81,
-    S_RP_NA_1 = 82,
+    /* S_RP_NA_1 = 82, */
     S_AR_NA_1 = 83,
     S_KR_NA_1 = 84,
     S_KS_NA_1 = 85,
@@ -203,7 +205,10 @@ typedef enum {
     F_AF_NA_1 = 124,
     F_SG_NA_1 = 125,
     F_DR_TA_1 = 126,
-    F_SC_NB_1 = 127
+    F_SC_NB_1 = 127,
+    S_RP_NA_1 = 136, /* A-profile key exchange */
+    S_SP_NA_1 = 137, /* A-profile security statistics */
+    S_SE_NA_1 = 138,  /* A-profile secure ASDU */
 } IEC60870_5_TypeID;
 
 typedef IEC60870_5_TypeID TypeID;

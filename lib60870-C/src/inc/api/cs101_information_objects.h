@@ -2078,8 +2078,7 @@ FileDirectory_getLengthOfFile(FileDirectory self);
 CP56Time2a
 FileDirectory_getCreationTime(FileDirectory self);
 
-void
-FileDirectory_destroy(FileDirectory self);
+void FileDirectory_destroy(FileDirectory self);
 
 /*************************************************
  * QueryLog: InformationObject
@@ -2089,6 +2088,9 @@ typedef struct sQueryLog* QueryLog;
 
 QueryLog
 QueryLog_create(QueryLog self, int ioa, uint16_t nof, const CP56Time2a rangeStartTime, const CP56Time2a rangeStopTime);
+
+void
+QueryLog_destroy(QueryLog self);
 
 uint16_t
 QueryLog_getNOF(QueryLog self);
@@ -2100,12 +2102,40 @@ QueryLog_getRangeStartTime(QueryLog self);
 CP56Time2a
 QueryLog_getRangeStopTime(QueryLog self);
 
-void
-QueryLog_destroy(QueryLog self);
 
-/**
- * @}
- */
+
+/*************************************************
+ * SecurityPublicKey : InformationObject
+ *************************************************/
+
+typedef struct sSecurityPublicKey* SecurityPublicKey;
+
+SecurityPublicKey SecurityPublicKey_create(SecurityPublicKey self, int ioa, int keyLength, const uint8_t* keyValue);
+
+void SecurityPublicKey_destroy(SecurityPublicKey self);
+
+int SecurityPublicKey_getKeyLength(SecurityPublicKey self);
+
+const uint8_t* SecurityPublicKey_getKeyValue(SecurityPublicKey self);
+
+/*************************************************
+ * SecurityEncryptedData : InformationObject
+ *************************************************/
+
+typedef struct sSecurityEncryptedData* SecurityEncryptedData;
+
+SecurityEncryptedData SecurityEncryptedData_create(SecurityEncryptedData self, int ioa, const uint8_t* nonce, const uint8_t* tag, int ciphertextLength, const uint8_t* ciphertext);
+
+void SecurityEncryptedData_destroy(SecurityEncryptedData self);
+
+const uint8_t* SecurityEncryptedData_getNonce(SecurityEncryptedData self);
+
+const uint8_t* SecurityEncryptedData_getTag(SecurityEncryptedData self);
+
+int SecurityEncryptedData_getCiphertextLength(SecurityEncryptedData self);
+
+const uint8_t* SecurityEncryptedData_getCiphertext(SecurityEncryptedData self);
+
 
 #ifdef __cplusplus
 }

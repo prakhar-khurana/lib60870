@@ -1,0 +1,10 @@
+^C:\USERS\Z005653N\DESKTOP\LIB60870\LIB60870-C\EXAMPLES\CS101_SLAVE_FILES\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/z005653n/Desktop/lib60870/lib60870-C -BC:/Users/z005653n/Desktop/lib60870/lib60870-C --check-stamp-file C:/Users/z005653n/Desktop/lib60870/lib60870-C/examples/cs101_slave_files/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

@@ -48,6 +48,11 @@
 #define MBEDTLS_X509_CRL_PARSE_C
 #define MBEDTLS_X509_USE_C
 #define MBEDTLS_SSL_CACHE_C
+#define MBEDTLS_ECP_C
+#define MBEDTLS_ECDH_C
+#define MBEDTLS_ECDSA_C
+#define MBEDTLS_ECP_DP_SECP256R1_ENABLED
+#define MBEDTLS_HKDF_C
 
 /* For test certificates */
 #define MBEDTLS_BASE64_C

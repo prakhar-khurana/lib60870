@@ -1,0 +1,21 @@
+# CMake generation dependency list for this directory.
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/CMakeLists.txt
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/client_CA1_1.key
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/client_CA1_1.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/client_CA1_2.key
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/client_CA1_2.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/client_CA1_3.key
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/client_CA1_3.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/client_CA1_4.key
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/client_CA1_4.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/root_CA1.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/server_CA1_1.key
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/server_CA1_1.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/server_CA1_1_chain.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/certs/test.crl
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/client1-key.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/client1.cer
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/client2.cer
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/root.cer
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/server-key.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/server.cer

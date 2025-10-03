@@ -118,7 +118,9 @@
  * disabled to keep the footprint small.
  */
 #ifndef CONFIG_CS104_APROFILE
-#define CONFIG_CS104_APROFILE 0
+#define CONFIG_CS104_APROFILE 1
+//#define CONFIG_CS104_APROFILE 0
+
 #endif
 
 /* Enable optional AEAD support for the A-profile implementation */

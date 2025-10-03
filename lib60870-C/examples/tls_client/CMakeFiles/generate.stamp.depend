@@ -1,0 +1,6 @@
+# CMake generation dependency list for this directory.
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/examples/tls_client/CMakeLists.txt
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/examples/tls_client/client_CA1_1.key
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/examples/tls_client/client_CA1_1.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/examples/tls_client/root_CA1.pem
+C:/Users/z005653n/Desktop/lib60870/lib60870-C/examples/tls_client/server_CA1_1.pem

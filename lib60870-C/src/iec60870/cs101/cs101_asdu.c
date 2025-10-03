@@ -25,6 +25,7 @@
 
 #include "iec60870_common.h"
 #include "information_objects_internal.h"
+#include "cs101_information_objects.h"
 #include "apl_types_internal.h"
 #include "lib_memory.h"
 #include "lib60870_internal.h"
@@ -1240,6 +1241,19 @@ CS101_ASDU_getElementEx(CS101_ASDU self, InformationObject io, int index)
 
         break;
 
+    case S_RP_NA_1: /* 136 - A-profile key exchange */
+
+        retVal = (InformationObject) SecurityPublicKey_getFromBuffer((SecurityPublicKey) io, self->parameters, self->payload, self->payloadSize, 0, false);
+
+        break;
+
+    case S_SE_NA_1: /* 138 - A-profile secure ASDU */
+
+        retVal = (InformationObject) SecurityEncryptedData_getFromBuffer((SecurityEncryptedData) io, self->parameters, self->payload, self->payloadSize, 0, false);
+
+        break;
+
+
     default:
     	DEBUG_PRINT("type %d not supported\n", CS101_ASDU_getTypeID(self));
     	break;
@@ -1552,6 +1566,3 @@ CS101_CauseOfTransmission_toString(CS101_CauseOfTransmission self)
         return "UNKNOWN_COT";
     }
 }
-
-
-

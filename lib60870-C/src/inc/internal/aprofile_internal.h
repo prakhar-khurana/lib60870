@@ -20,6 +20,56 @@
 #ifndef APROFILE_INTERNAL_H_
 #define APROFILE_INTERNAL_H_
 
-#include "../../iec60870/security/62351-5/aprofile_context.h"
+#include "aprofile_context.h"
+
+#if (CONFIG_CS104_APROFILE == 1)
+
+#include "mbedtls/gcm.h"
+#include "mbedtls/ecdh.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/hkdf.h"
+#include "mbedtls/entropy.h"
+
+#include "iec60870_common.h"
+
+typedef bool (*AProfile_SendAsduCallback)(void* connection, CS101_ASDU asdu);
+
+typedef enum {
+    KEY_EXCHANGE_IDLE,
+    KEY_EXCHANGE_AWAIT_REPLY,
+    KEY_EXCHANGE_COMPLETE
+} KeyExchangeState;
+
+/* Placeholder for security state */
+struct sAProfileContext
+{
+    bool security_active;
+    uint32_t local_sequence_number;
+    uint32_t remote_sequence_number;
+
+    void* connection; /* Reference to the CS104_Connection or MasterConnection */
+    AProfile_SendAsduCallback sendAsdu;
+
+    KeyExchangeState keyExchangeState;
+
+    mbedtls_ecdh_context ecdh;
+    mbedtls_entropy_context entropy;
+    mbedtls_ctr_drbg_context ctr_drbg;
+    mbedtls_gcm_context gcm_encrypt;
+    mbedtls_gcm_context gcm_decrypt;
+
+    uint8_t localPublicKey[65];
+    int localPublicKeyLen;
+};
+
+#else
+
+/* This is a dummy struct for when A-profile is disabled */
+struct sAProfileContext
+{
+    bool security_active;
+};
+
+#endif /* CONFIG_CS104_APROFILE */
 
 #endif /* APROFILE_INTERNAL_H_ */

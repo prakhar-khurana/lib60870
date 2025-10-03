@@ -99,36 +99,9 @@ securityEventHandler(void* parameter, TLSEventLevel eventLevel, int eventCode, c
            peerAddr);
 }
 
-int
-main(int argc, char** argv)
+static void
+run_test_sequence(CS104_Connection con)
 {
-    char* hostname = "127.0.0.1";
-
-    if (argc > 1)
-    {
-        hostname = argv[1];
-    }
-
-    TLSConfiguration tlsConfig = TLSConfiguration_create();
-
-    TLSConfiguration_setEventHandler(tlsConfig, securityEventHandler, NULL);
-
-    TLSConfiguration_setChainValidation(tlsConfig, true);
-    TLSConfiguration_setAllowOnlyKnownCertificates(tlsConfig, true);
-
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig, "client_CA1_1.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig, "client_CA1_1.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig, "root_CA1.pem");
-
-    TLSConfiguration_addAllowedCertificateFromFile(tlsConfig, "server_CA1_1.pem");
-
-    // TLSConfiguration_setMaxTlsVersion(tlsConfig, TLS_VERSION_TLS_1_1);
-
-    CS104_Connection con = CS104_Connection_createSecure(hostname, IEC_60870_5_104_DEFAULT_TLS_PORT, tlsConfig);
-
-    CS104_Connection_setConnectionHandler(con, connectionHandler, NULL);
-    CS104_Connection_setASDUReceivedHandler(con, asduReceivedHandler, NULL);
-
     if (CS104_Connection_connect(con))
     {
         printf("Connected!\n");
@@ -164,43 +137,46 @@ main(int argc, char** argv)
     }
     else
         printf("Connect failed!\n");
+}
+
+int
+main(int argc, char** argv)
+{
+    char* hostname = "127.0.0.1";
+
+    if (argc > 1)
+    {
+        hostname = argv[1];
+    }
+
+    TLSConfiguration tlsConfig = TLSConfiguration_create();
+
+    TLSConfiguration_setEventHandler(tlsConfig, securityEventHandler, NULL);
+
+    TLSConfiguration_setChainValidation(tlsConfig, true);
+    TLSConfiguration_setAllowOnlyKnownCertificates(tlsConfig, true);
+
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig, "client_CA1_1.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig, "client_CA1_1.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig, "root_CA1.pem");
+
+    TLSConfiguration_addAllowedCertificateFromFile(tlsConfig, "server_CA1_1.pem");
+
+    // TLSConfiguration_setMaxTlsVersion(tlsConfig, TLS_VERSION_TLS_1_1);
+
+    CS104_Connection con = CS104_Connection_createSecure(hostname, IEC_60870_5_104_DEFAULT_TLS_PORT, tlsConfig);
+
+    CS104_Connection_setConnectionHandler(con, connectionHandler, NULL);
+    CS104_Connection_setASDUReceivedHandler(con, asduReceivedHandler, NULL);
+
+    printf("Running test sequence 1...\n");
+    run_test_sequence(con);
 
     printf("Waiting...\n");
     Thread_sleep(5000);
 
-    if (CS104_Connection_connect(con))
-    {
-        printf("Connected!\n");
-
-        CS104_Connection_sendStartDT(con);
-
-        Thread_sleep(1000);
-
-        CS104_Connection_sendInterrogationCommand(con, CS101_COT_ACTIVATION, 1, IEC60870_QOI_STATION);
-
-        Thread_sleep(1000);
-
-        InformationObject sc = (InformationObject)SingleCommand_create(NULL, 5000, true, false, 0);
-
-        printf("Send control command C_SC_NA_1\n");
-        CS104_Connection_sendProcessCommand(con, C_SC_NA_1, CS101_COT_ACTIVATION, 1, sc);
-
-        InformationObject_destroy(sc);
-
-        /* Send clock synchronization command */
-        struct sCP56Time2a newTime;
-
-        CP56Time2a_createFromMsTimestamp(&newTime, Hal_getTimeInMs());
-
-        printf("Send time sync command\n");
-        CS104_Connection_sendClockSyncCommand(con, 1, &newTime);
-
-        Thread_sleep(1000);
-
-        printf("Close connection\n");
-    }
-    else
-        printf("Connect failed!\n");
+    printf("\nRunning test sequence 2 (reconnect)...\n");
+    run_test_sequence(con);
 
     Thread_sleep(1000);
 

@@ -1,7 +1,9 @@
 #include "unity.h"
+#include "cs101_information_objects.h"
 #include "iec60870_common.h"
 #include "cs104_slave.h"
 #include "cs104_connection.h"
+#include "cs104_security.h"
 #include "hal_time.h"
 #include "hal_thread.h"
 #include "buffer_frame.h"
@@ -10,10 +12,6 @@
 
 #ifndef CONFIG_CS104_SUPPORT_TLS
 #define CONFIG_CS104_SUPPORT_TLS 0
-#endif
-
-#if WIN32
-#define bzero(b,len) (memset((b), '\0', (len)), (void) 0) 
 #endif
 
 void setUp(void) { }
@@ -424,14 +422,14 @@ test_StepPositionWithCP24Time2a(void)
 	struct sCP24Time2a cpTime7;
 	struct sCP24Time2a cpTime8;
 
-	bzero(&cpTime1, sizeof(struct sCP24Time2a));
-	bzero(&cpTime2, sizeof(struct sCP24Time2a));
-	bzero(&cpTime3, sizeof(struct sCP24Time2a));
-	bzero(&cpTime4, sizeof(struct sCP24Time2a));
-	bzero(&cpTime5, sizeof(struct sCP24Time2a));
-	bzero(&cpTime6, sizeof(struct sCP24Time2a));
-	bzero(&cpTime7, sizeof(struct sCP24Time2a));
-	bzero(&cpTime8, sizeof(struct sCP24Time2a));
+	memset(&cpTime1, 0, sizeof(struct sCP24Time2a));
+	memset(&cpTime2, 0, sizeof(struct sCP24Time2a));
+	memset(&cpTime3, 0, sizeof(struct sCP24Time2a));
+	memset(&cpTime4, 0, sizeof(struct sCP24Time2a));
+	memset(&cpTime5, 0, sizeof(struct sCP24Time2a));
+	memset(&cpTime6, 0, sizeof(struct sCP24Time2a));
+	memset(&cpTime7, 0, sizeof(struct sCP24Time2a));
+	memset(&cpTime8, 0, sizeof(struct sCP24Time2a));
 
 	CP24Time2a_setMinute(&cpTime1, 12);
 	CP24Time2a_setMillisecond(&cpTime1, 24123);
@@ -2008,9 +2006,9 @@ test_DoublePointWithCP24Time2a(void)
     struct sCP24Time2a cpTime2;
     struct sCP24Time2a cpTime3;
 
-    bzero(&cpTime1, sizeof(struct sCP24Time2a));
-    bzero(&cpTime2, sizeof(struct sCP24Time2a));
-    bzero(&cpTime3, sizeof(struct sCP24Time2a));
+    memset(&cpTime1, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime2, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime3, 0, sizeof(struct sCP24Time2a));
 
     CP24Time2a_setMinute(&cpTime1, 12);
     CP24Time2a_setMillisecond(&cpTime1, 24123);
@@ -2107,9 +2105,9 @@ test_SinglePointWithCP24Time2a(void)
     struct sCP24Time2a cpTime2;
     struct sCP24Time2a cpTime3;
 
-    bzero(&cpTime1, sizeof(struct sCP24Time2a));
-    bzero(&cpTime2, sizeof(struct sCP24Time2a));
-    bzero(&cpTime3, sizeof(struct sCP24Time2a));
+    memset(&cpTime1, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime2, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime3, 0, sizeof(struct sCP24Time2a));
 
     CP24Time2a_setMinute(&cpTime1, 12);
     CP24Time2a_setMillisecond(&cpTime1, 24123);
@@ -2554,14 +2552,14 @@ test_MeasuredValueNormalizedWithCP24Time2a(void)
     struct sCP24Time2a cpTime7;
     struct sCP24Time2a cpTime8;
 
-    bzero(&cpTime1, sizeof(struct sCP24Time2a));
-    bzero(&cpTime2, sizeof(struct sCP24Time2a));
-    bzero(&cpTime3, sizeof(struct sCP24Time2a));
-    bzero(&cpTime4, sizeof(struct sCP24Time2a));
-    bzero(&cpTime5, sizeof(struct sCP24Time2a));
-    bzero(&cpTime6, sizeof(struct sCP24Time2a));
-    bzero(&cpTime7, sizeof(struct sCP24Time2a));
-    bzero(&cpTime8, sizeof(struct sCP24Time2a));
+    memset(&cpTime1, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime2, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime3, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime4, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime5, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime6, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime7, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime8, 0, sizeof(struct sCP24Time2a));
 
     CP24Time2a_setMinute(&cpTime1, 12);
     CP24Time2a_setMillisecond(&cpTime1, 24123);
@@ -3052,14 +3050,14 @@ test_MeasuredValueScaledWithCP24Time2a(void)
     struct sCP24Time2a cpTime7;
     struct sCP24Time2a cpTime8;
 
-    bzero(&cpTime1, sizeof(struct sCP24Time2a));
-    bzero(&cpTime2, sizeof(struct sCP24Time2a));
-    bzero(&cpTime3, sizeof(struct sCP24Time2a));
-    bzero(&cpTime4, sizeof(struct sCP24Time2a));
-    bzero(&cpTime5, sizeof(struct sCP24Time2a));
-    bzero(&cpTime6, sizeof(struct sCP24Time2a));
-    bzero(&cpTime7, sizeof(struct sCP24Time2a));
-    bzero(&cpTime8, sizeof(struct sCP24Time2a));
+    memset(&cpTime1, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime2, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime3, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime4, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime5, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime6, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime7, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime8, 0, sizeof(struct sCP24Time2a));
 
     CP24Time2a_setMinute(&cpTime1, 12);
     CP24Time2a_setMillisecond(&cpTime1, 24123);
@@ -3539,14 +3537,14 @@ test_MeasuredValueShortWithCP24Time2a(void)
     struct sCP24Time2a cpTime7;
     struct sCP24Time2a cpTime8;
 
-    bzero(&cpTime1, sizeof(struct sCP24Time2a));
-    bzero(&cpTime2, sizeof(struct sCP24Time2a));
-    bzero(&cpTime3, sizeof(struct sCP24Time2a));
-    bzero(&cpTime4, sizeof(struct sCP24Time2a));
-    bzero(&cpTime5, sizeof(struct sCP24Time2a));
-    bzero(&cpTime6, sizeof(struct sCP24Time2a));
-    bzero(&cpTime7, sizeof(struct sCP24Time2a));
-    bzero(&cpTime8, sizeof(struct sCP24Time2a));
+    memset(&cpTime1, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime2, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime3, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime4, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime5, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime6, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime7, 0, sizeof(struct sCP24Time2a));
+    memset(&cpTime8, 0, sizeof(struct sCP24Time2a));
 
     CP24Time2a_setMinute(&cpTime1, 12);
     CP24Time2a_setMillisecond(&cpTime1, 24123);
@@ -3951,8 +3949,8 @@ test_IntegratedTotalsWithCP24Time2a(void)
     struct sCP24Time2a cpTime1;
     struct sCP24Time2a cpTime2;
 
-    bzero(&cpTime1, sizeof(struct sCP24Time2a));
-    bzero(&cpTime2, sizeof(struct sCP24Time2a));
+    memset(&cpTime1,0,  sizeof(struct sCP24Time2a));
+    memset(&cpTime2, 0, sizeof(struct sCP24Time2a));
 
     CP24Time2a_setMinute(&cpTime1, 12);
     CP24Time2a_setMillisecond(&cpTime1, 24123);
@@ -4907,7 +4905,7 @@ test_DelayAcquisitionCommand(void)
 
     struct sCP16Time2a delay;
 
-    bzero(&delay, sizeof(struct sCP16Time2a));
+    memset(&delay, 0, sizeof(struct sCP16Time2a));
 
     CP16Time2a_setEplapsedTimeInMs(&delay, 24123);
 
@@ -7267,6 +7265,105 @@ test_CS104Slave_handleResetProcessCommand()
     CS104_Slave_destroy(slave);
 }
 
+#if (CONFIG_CS104_APROFILE == 1)
+
+static CS101_ASDU receivedClientAsdu = NULL;
+
+static bool
+test_AProfile_clientAsduReceivedHandler(void* parameter, int address, CS101_ASDU asdu)
+{
+    if (receivedClientAsdu != NULL)
+        CS101_ASDU_destroy(receivedClientAsdu);
+
+    receivedClientAsdu = CS101_ASDU_clone(asdu, NULL);
+
+    return true;
+}
+
+static bool
+test_AProfile_interrogationHandler(void* parameter, IMasterConnection connection, CS101_ASDU asdu, uint8_t qoi)
+{
+    if (qoi == 20) { /* station interrogation */
+        IMasterConnection_sendACT_CON(connection, asdu, false);
+
+        CS101_AppLayerParameters alParams = IMasterConnection_getApplicationLayerParameters(connection);
+
+        CS101_ASDU newAsdu = CS101_ASDU_create(alParams, false, CS101_COT_INTERROGATED_BY_STATION,
+                0, 1, false, false);
+
+        InformationObject io = (InformationObject) MeasuredValueScaled_create(NULL, 12345, 9876, IEC60870_QUALITY_GOOD);
+
+        CS101_ASDU_addInformationObject(newAsdu, io);
+
+        InformationObject_destroy(io);
+
+        IMasterConnection_sendASDU(connection, newAsdu);
+
+        CS101_ASDU_destroy(newAsdu);
+
+        IMasterConnection_sendACT_TERM(connection, asdu);
+    }
+    else {
+        IMasterConnection_sendACT_CON(connection, asdu, true);
+    }
+
+    return true;
+}
+
+
+void
+test_AProfile_KeyExchangeAndDataEncryption(void)
+{
+    /* Slave setup */
+    CS104_Slave slave = CS104_Slave_create(10, 10);
+    CS104_Slave_setLocalPort(slave, 2404);
+    CS104_Slave_setInterrogationHandler(slave, test_AProfile_interrogationHandler, NULL);
+    CS104_Slave_setSecurityConfig(slave, NULL, NULL, NULL);
+    CS104_Slave_start(slave);
+
+    /* Client setup */
+    CS104_Connection con = CS104_Connection_create("127.0.0.1", 2404);
+    CS104_Connection_setSecurityConfig(con, NULL, NULL, NULL);
+    CS104_Connection_setASDUReceivedHandler(con, test_AProfile_clientAsduReceivedHandler, NULL);
+
+    /* Connect and wait for key exchange */
+    bool result = CS104_Connection_connect(con);
+    TEST_ASSERT_TRUE(result);
+
+    CS104_Connection_sendStartDT(con);
+
+    Thread_sleep(1000); /* Give time for key exchange to complete */
+
+    /* Send encrypted interrogation command */
+    CS104_Connection_sendInterrogationCommand(con, CS101_COT_ACTIVATION, 1, IEC60870_QOI_STATION);
+
+    Thread_sleep(1000); /* Give time for slave to respond */
+
+    /* Check if we received the correct (decrypted) response */
+    TEST_ASSERT_NOT_NULL(receivedClientAsdu);
+
+    if (receivedClientAsdu) {
+        TEST_ASSERT_EQUAL_INT(M_ME_NB_1, CS101_ASDU_getTypeID(receivedClientAsdu));
+        TEST_ASSERT_EQUAL_INT(CS101_COT_INTERROGATED_BY_STATION, CS101_ASDU_getCOT(receivedClientAsdu));
+
+        InformationObject io = CS101_ASDU_getElement(receivedClientAsdu, 0);
+        TEST_ASSERT_NOT_NULL(io);
+
+        if (io) {
+            TEST_ASSERT_EQUAL_INT(12345, InformationObject_getObjectAddress(io));
+            TEST_ASSERT_EQUAL_INT(9876, MeasuredValueScaled_getValue((MeasuredValueScaled)io));
+            InformationObject_destroy(io);
+        }
+
+        CS101_ASDU_destroy(receivedClientAsdu);
+        receivedClientAsdu = NULL;
+    }
+
+    CS104_Connection_destroy(con);
+    CS104_Slave_destroy(slave);
+}
+#endif
+
 int
 main(int argc, char** argv)
 {
@@ -7407,6 +7504,10 @@ main(int argc, char** argv)
     RUN_TEST(test_CS104Slave_rejectCommandWithUnknownCA);
 
     RUN_TEST(test_CS104Slave_handleResetProcessCommand);
+
+#if (CONFIG_CS104_APROFILE == 1)
+    RUN_TEST(test_AProfile_KeyExchangeAndDataEncryption);
+#endif
 
     return UNITY_END();
 }

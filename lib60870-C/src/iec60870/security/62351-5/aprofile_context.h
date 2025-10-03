@@ -23,6 +23,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "cs104_frame.h" /* For T104Frame */
+
 typedef struct sAProfileContext* AProfileContext;
 
 typedef enum
@@ -32,16 +34,22 @@ typedef enum
     APROFILE_CTRL_MSG
 } AProfileKind;
 
-typedef struct sT104Frame* T104Frame;
+AProfileContext
+AProfile_create(void);
 
-AProfileContext AProfile_create(void);
-void AProfile_destroy(AProfileContext ctx);
+void
+AProfile_destroy(AProfileContext ctx);
 
-bool AProfile_onStartDT(AProfileContext ctx);
-bool AProfile_ready(AProfileContext ctx);
+bool
+AProfile_onStartDT(AProfileContext ctx);
 
-bool AProfile_wrapOutAsdu(AProfileContext ctx, T104Frame frame);
-AProfileKind AProfile_handleInPdu(AProfileContext ctx, const uint8_t* in, int inSize,
-                                  const uint8_t** out, int* outSize);
+bool
+AProfile_ready(AProfileContext ctx);
+
+bool
+AProfile_wrapOutAsdu(AProfileContext ctx, T104Frame frame);
+
+AProfileKind
+AProfile_handleInPdu(AProfileContext ctx, const uint8_t* in, int inSize, const uint8_t** out, int* outSize);
 
 #endif /* APROFILE_CONTEXT_H_ */

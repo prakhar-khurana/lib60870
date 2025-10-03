@@ -81,6 +81,9 @@ MasterConnection_activate(MasterConnection self);
 static bool
 MasterConnection_isActive(MasterConnection self);
 
+static bool
+sendASDUInternal(MasterConnection self, CS101_ASDU asdu);
+
 #define CS104_DEFAULT_PORT 2404
 
 static struct sCS104_APCIParameters defaultConnectionParameters = {
@@ -1790,22 +1793,24 @@ CS104_Slave_setRawMessageHandler(CS104_Slave self, CS104_SlaveRawMessageHandler 
 }
 
 #if (CONFIG_CS104_APROFILE == 1)
+static bool
+cs104Server_sendAsdu(void* connection, CS101_ASDU asdu)
+{
+    return sendASDUInternal((MasterConnection)connection, asdu);
+}
+#endif
+
+#if (CONFIG_CS104_APROFILE == 1)
 void
 CS104_Slave_setSecurityConfig(CS104_Slave self, const CS104_SecurityConfig* sec,
                               const CS104_CertConfig* cert, const CS104_RoleConfig* role)
 {
     self->securityConfigured = true;
-    if (sec)
-        self->securityConfig = *sec;
-    if (cert)
-        self->certConfig = *cert;
-    if (role)
-        self->roleConfig = *role;
 
     for (int i = 0; i < CONFIG_CS104_MAX_CLIENT_CONNECTIONS; i++)
     {
         if (self->masterConnections[i] && self->masterConnections[i]->sec == NULL)
-            self->masterConnections[i]->sec = AProfile_create();
+            self->masterConnections[i]->sec = AProfile_create(self->masterConnections[i], cs104Server_sendAsdu);
     }
 }
 #else
@@ -2939,6 +2944,11 @@ handleMessage(MasterConnection self, uint8_t* buffer, int msgSize)
                 int asduLen = msgSize - 6;
 
 #if (CONFIG_CS104_APROFILE == 1)
+                /*
+                 * For IEC 62351-5 (A-profile) security, the ASDU is unwrapped and verified here.
+                 * The AProfile_handleInPdu function should be implemented to handle the security layer,
+                 * check the MAC and sequence numbers, and then provide the original ASDU for processing.
+                 */
                 if (self->sec)
                 {
                     AProfileKind kind =

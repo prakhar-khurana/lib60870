@@ -7832,6 +7832,8 @@ QueryLog_encode(QueryLog self, Frame frame, CS101_AppLayerParameters parameters,
     return true;
 }
 
+void QueryLog_destroy(QueryLog self);
+
 struct sInformationObjectVFT QueryLogVFT = {(EncodeFunction)QueryLog_encode, (DestroyFunction)QueryLog_destroy};
 
 static void
@@ -7855,6 +7857,246 @@ QueryLog_create(QueryLog self, int ioa, uint16_t nof, const CP56Time2a rangeStar
         self->nof = nof;
         self->rangeStartTime = *rangeStartTime;
         self->rangeStopTime = *rangeStopTime;
+    }
+
+    return self;
+}
+
+/*************************************************
+ * SecurityPublicKey : InformationObject
+ *************************************************/
+
+struct sSecurityPublicKey
+{
+    int objectAddress;
+    TypeID type;
+    InformationObjectVFT virtualFunctionTable;
+    int keyLength;
+    uint8_t keyValue[256];
+};
+
+static bool
+SecurityPublicKey_encode(SecurityPublicKey self, Frame frame, CS101_AppLayerParameters parameters, bool isSequence)
+{
+    int size = isSequence ? (1 + self->keyLength) : (parameters->sizeOfIOA + 1 + self->keyLength);
+
+    if (Frame_getSpaceLeft(frame) < size)
+        return false;
+
+    InformationObject_encodeBase((InformationObject)self, frame, parameters, isSequence);
+
+    Frame_setNextByte(frame, (uint8_t)self->keyLength);
+    Frame_appendBytes(frame, self->keyValue, self->keyLength);
+
+    return true;
+}
+
+struct sInformationObjectVFT securityPublicKeyVFT = { (EncodeFunction)SecurityPublicKey_encode,
+                                                      (DestroyFunction)SecurityPublicKey_destroy };
+
+static void
+SecurityPublicKey_initialize(SecurityPublicKey self)
+{
+    self->virtualFunctionTable = &(securityPublicKeyVFT);
+    self->type = S_RP_NA_1;
+}
+
+SecurityPublicKey
+SecurityPublicKey_create(SecurityPublicKey self, int ioa, int keyLength, const uint8_t* keyValue)
+{
+    if (self == NULL)
+        self = (SecurityPublicKey)GLOBAL_MALLOC(sizeof(struct sSecurityPublicKey));
+
+    if (self)
+    {
+        SecurityPublicKey_initialize(self);
+        self->objectAddress = ioa;
+        self->keyLength = keyLength;
+        memcpy(self->keyValue, keyValue, keyLength);
+    }
+
+    return self;
+}
+
+void
+SecurityPublicKey_destroy(SecurityPublicKey self)
+{
+    GLOBAL_FREEMEM(self);
+}
+
+int
+SecurityPublicKey_getKeyLength(SecurityPublicKey self)
+{
+    return self->keyLength;
+}
+
+const uint8_t*
+SecurityPublicKey_getKeyValue(SecurityPublicKey self)
+{
+    return self->keyValue;
+}
+
+SecurityPublicKey
+SecurityPublicKey_getFromBuffer(SecurityPublicKey self, CS101_AppLayerParameters parameters, uint8_t* msg, int msgSize,
+                                int startIndex, bool isSequence)
+{
+    int minSize = startIndex + 1;
+
+    if (!isSequence)
+        minSize += parameters->sizeOfIOA;
+
+    if (minSize > msgSize)
+        return NULL;
+
+    int keyLength = msg[startIndex + (isSequence ? 0 : parameters->sizeOfIOA)];
+
+    minSize += keyLength;
+
+    if (minSize > msgSize)
+        return NULL;
+
+    if (self == NULL)
+        self = (SecurityPublicKey)GLOBAL_MALLOC(sizeof(struct sSecurityPublicKey));
+
+    if (self)
+    {
+        SecurityPublicKey_initialize(self);
+
+        if (!isSequence)
+        {
+            InformationObject_getFromBuffer((InformationObject)self, parameters, msg, startIndex);
+            startIndex += parameters->sizeOfIOA;
+        }
+
+        self->keyLength = msg[startIndex++];
+        memcpy(self->keyValue, msg + startIndex, self->keyLength);
+    }
+
+    return self;
+}
+
+/*************************************************
+ * SecurityEncryptedData : InformationObject
+ *************************************************/
+
+struct sSecurityEncryptedData
+{
+    int objectAddress;
+    TypeID type;
+    InformationObjectVFT virtualFunctionTable;
+    uint8_t nonce[12];
+    uint8_t tag[16];
+    int ciphertextLength;
+    uint8_t ciphertext[256];
+};
+
+static bool
+SecurityEncryptedData_encode(SecurityEncryptedData self, Frame frame, CS101_AppLayerParameters parameters, bool isSequence)
+{
+    int size = isSequence ? (28 + self->ciphertextLength) : (parameters->sizeOfIOA + 28 + self->ciphertextLength);
+
+    if (Frame_getSpaceLeft(frame) < size)
+        return false;
+
+    InformationObject_encodeBase((InformationObject)self, frame, parameters, isSequence);
+
+    Frame_appendBytes(frame, self->nonce, 12);
+    Frame_appendBytes(frame, self->tag, 16);
+    Frame_appendBytes(frame, self->ciphertext, self->ciphertextLength);
+
+    return true;
+}
+
+struct sInformationObjectVFT securityEncryptedDataVFT = { (EncodeFunction)SecurityEncryptedData_encode,
+                                                         (DestroyFunction)SecurityEncryptedData_destroy };
+
+static void
+SecurityEncryptedData_initialize(SecurityEncryptedData self)
+{
+    self->virtualFunctionTable = &(securityEncryptedDataVFT);
+    self->type = S_SE_NA_1;
+}
+
+SecurityEncryptedData
+SecurityEncryptedData_create(SecurityEncryptedData self, int ioa, const uint8_t* nonce, const uint8_t* tag, int ciphertextLength, const uint8_t* ciphertext)
+{
+    if (self == NULL)
+        self = (SecurityEncryptedData)GLOBAL_MALLOC(sizeof(struct sSecurityEncryptedData));
+
+    if (self)
+    {
+        SecurityEncryptedData_initialize(self);
+        self->objectAddress = ioa;
+        memcpy(self->nonce, nonce, 12);
+        memcpy(self->tag, tag, 16);
+        self->ciphertextLength = ciphertextLength;
+        memcpy(self->ciphertext, ciphertext, ciphertextLength);
+    }
+
+    return self;
+}
+
+void
+SecurityEncryptedData_destroy(SecurityEncryptedData self)
+{
+    GLOBAL_FREEMEM(self);
+}
+
+const uint8_t*
+SecurityEncryptedData_getNonce(SecurityEncryptedData self)
+{
+    return self->nonce;
+}
+
+const uint8_t*
+SecurityEncryptedData_getTag(SecurityEncryptedData self)
+{
+    return self->tag;
+}
+
+int
+SecurityEncryptedData_getCiphertextLength(SecurityEncryptedData self)
+{
+    return self->ciphertextLength;
+}
+
+const uint8_t*
+SecurityEncryptedData_getCiphertext(SecurityEncryptedData self)
+{
+    return self->ciphertext;
+}
+
+SecurityEncryptedData
+SecurityEncryptedData_getFromBuffer(SecurityEncryptedData self, CS101_AppLayerParameters parameters, uint8_t* msg, int msgSize,
+                                    int startIndex, bool isSequence)
+{
+    int minSize = startIndex + 28;
+
+    if (!isSequence)
+        minSize += parameters->sizeOfIOA;
+
+    if (minSize > msgSize)
+        return NULL;
+
+    if (self == NULL)
+        self = (SecurityEncryptedData)GLOBAL_MALLOC(sizeof(struct sSecurityEncryptedData));
+
+    if (self)
+    {
+        SecurityEncryptedData_initialize(self);
+
+        if (!isSequence)
+        {
+            InformationObject_getFromBuffer((InformationObject)self, parameters, msg, startIndex);
+            startIndex += parameters->sizeOfIOA;
+        }
+
+        memcpy(self->nonce, msg + startIndex, 12);
+        startIndex += 12;
+        memcpy(self->tag, msg + startIndex, 16);
+        startIndex += 16;
+        self->ciphertextLength = msgSize - startIndex;
+        memcpy(self->ciphertext, msg + startIndex, self->ciphertextLength);
     }
 
     return self;

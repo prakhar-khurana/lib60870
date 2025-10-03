@@ -1,0 +1,381 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\file-service\file_server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\apl\cpXXtime2a.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs101\cs101_asdu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs101\cs101_bcr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs101\cs101_information_objects.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs101\cs101_master_connection.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs101\cs101_master.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs101\cs101_queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs101\cs101_slave.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs104\cs104_connection.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs104\cs104_frame.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\cs104\cs104_slave.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\security\62351-5\aprofile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\link_layer\buffer_frame.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\link_layer\link_layer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\link_layer\serial_transceiver_ft_1_2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\frame.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\iec60870\lib60870_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\common\linked_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\serial\win32\serial_port_win32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\socket\win32\socket_win32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\thread\win32\thread_win32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\time\win32\time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\memory\lib_memory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\aes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\aesni.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\arc4.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\aria.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\asn1parse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\asn1write.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\base64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\bignum.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\blowfish.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\camellia.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ccm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\certs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\chacha20.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\chachapoly.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\cipher.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\cipher_wrap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\cmac.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\constant_time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ctr_drbg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\debug.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\des.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\dhm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ecdh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ecdsa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ecjpake.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ecp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ecp_curves.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\entropy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\entropy_poll.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\error.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\gcm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\havege.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\hkdf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\hmac_drbg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\md.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\md2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\md4.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\md5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\memory_buffer_alloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\mps_reader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\mps_trace.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\net_sockets.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\nist_kw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\oid.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\padlock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\pem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\pk.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\pk_wrap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\pkcs11.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\pkcs12.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\pkcs5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\pkparse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\pkwrite.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\platform.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\platform_util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\poly1305.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_aead.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_cipher.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_client.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_driver_wrappers.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_ecp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_hash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_mac.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_rsa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_se.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_slot_management.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_crypto_storage.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\psa_its_file.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ripemd160.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\rsa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\rsa_internal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\sha1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\sha256.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\sha512.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_cache.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_ciphersuites.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_cli.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_cookie.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_msg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_srv.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_ticket.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_tls.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\ssl_tls13_keys.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\threading.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\timing.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\version.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\version_features.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\x509.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\x509_create.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\x509_crl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\x509_crt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\x509_csr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\x509write_crt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\x509write_csr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\library\xtea.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\tls\mbedtls\tls_mbedtls.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\version.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{AAC336F0-9190-3AB5-94AB-2B710E73498C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

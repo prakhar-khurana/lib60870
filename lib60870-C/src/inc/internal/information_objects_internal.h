@@ -316,6 +316,12 @@ FileDirectory_getFromBuffer(FileDirectory self, CS101_AppLayerParameters paramet
 QueryLog
 QueryLog_getFromBuffer(QueryLog self, CS101_AppLayerParameters parameters, uint8_t* msg, int msgSize, int startIndex);
 
+SecurityPublicKey
+SecurityPublicKey_getFromBuffer(SecurityPublicKey self, CS101_AppLayerParameters parameters, uint8_t* msg, int msgSize, int startIndex, bool isSequence);
+
+SecurityEncryptedData
+SecurityEncryptedData_getFromBuffer(SecurityEncryptedData self, CS101_AppLayerParameters parameters, uint8_t* msg, int msgSize, int startIndex, bool isSequence);
+
 /********************************************
  * static InformationObject type definitions
  ********************************************/
