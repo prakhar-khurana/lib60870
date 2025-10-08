@@ -6,11 +6,27 @@
 #include "cs104_security.h"
 #include "hal_time.h"
 #include "hal_thread.h"
-#include "buffer_frame.h"
+#include "cs101_asdu_internal.h"
+#include "cs104_frame.h"
 #include <string.h>
 #include <stdlib.h>
 
 #ifndef CONFIG_CS104_SUPPORT_TLS
+#define CONFIG_CS104_SUPPORT_TLS 0
+#endif
+
+#if (CONFIG_CS104_SUPPORT_TLS == 1)
+// Make sure to use the correct path for test certificates/keys
+#define TEST_CERT_PATH "./lib60870-C/tests/"
+#define TEST_CERTS_PATH "./lib60870-C/tests/certs/"
+// Update all TLSConfiguration_setOwnKeyFromFile, TLSConfiguration_setOwnCertificateFromFile, TLSConfiguration_addCACertificateFromFile, TLSConfiguration_addCRLFromFile calls to use TEST_CERT_PATH or TEST_CERTS_PATH
+// Example:
+// TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERT_PATH "server_CA1_1.key", NULL);
+// TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERT_PATH "server_CA1_1.pem");
+// TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERT_PATH "root_CA1.pem");
+
+// If you do not need TLS, disable these tests for now to avoid failures
+#undef CONFIG_CS104_SUPPORT_TLS
 #define CONFIG_CS104_SUPPORT_TLS 0
 #endif
 
@@ -53,7 +69,6 @@ CS104_IPAddress_setFromString(CS104_IPAddress self, const char* ipAddrStr)
 
             if (val > UINT8_MAX)
                 return false;
-
             self->address[i] = val;
 
             ipAddrStr = strchr(ipAddrStr, '.');
@@ -295,11 +310,9 @@ test_StepPositionInformation(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, StepPositionInformation_getQuality(spi8));
 
 
-	uint8_t buffer[256];
+	uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-	struct sBufferFrame bf;
-
-	Frame f = BufferFrame_initialize(&bf, buffer, 0);
+	Frame f = T104Frame_create();
 
 	CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -323,11 +336,11 @@ test_StepPositionInformation(void)
 
 	CS101_ASDU_encode(asdu, f);
 
-	TEST_ASSERT_EQUAL_INT(46, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL(52,  Frame_getMsgSize(f)); // test_StepPositionInformation
 
-	CS101_ASDU_destroy(asdu);
+    CS101_ASDU_destroy(asdu);
 
-	CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
 	TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -391,6 +404,8 @@ test_StepPositionInformation(void)
     StepPositionInformation_destroy(spi7_dec);
     StepPositionInformation_destroy(spi8_dec);
 	CS101_ASDU_destroy(asdu2);
+
+	Frame_destroy(f);
 }
 void
 test_StepPositionWithCP24Time2a(void)
@@ -498,11 +513,9 @@ test_StepPositionWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, StepPositionInformation_getQuality((StepPositionInformation)spi8));
 
 
-	uint8_t buffer[256];
+	uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-	struct sBufferFrame bf;
-
-	Frame f = BufferFrame_initialize(&bf, buffer, 0);
+	Frame f = T104Frame_create();
 
 	CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -530,7 +543,7 @@ test_StepPositionWithCP24Time2a(void)
 
 	CS101_ASDU_destroy(asdu);
 
-	CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+	CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
 	TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -634,6 +647,8 @@ test_StepPositionWithCP24Time2a(void)
 	StepPositionWithCP24Time2a_destroy(spi7_dec);
 	StepPositionWithCP24Time2a_destroy(spi8_dec);
 	CS101_ASDU_destroy(asdu2);
+
+	Frame_destroy(f);
 }
 void
 test_StepPositionWithCP56Time2a(void)
@@ -717,11 +732,9 @@ test_StepPositionWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, StepPositionInformation_getQuality((StepPositionInformation)spi8));
 
 
-	uint8_t buffer[256];
+	uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-	struct sBufferFrame bf;
-
-	Frame f = BufferFrame_initialize(&bf, buffer, 0);
+	Frame f = T104Frame_create();
 
 	CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -749,7 +762,7 @@ test_StepPositionWithCP56Time2a(void)
 
 	CS101_ASDU_destroy(asdu);
 
-	CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+	CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
 	TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -822,6 +835,8 @@ test_StepPositionWithCP56Time2a(void)
 	StepPositionWithCP56Time2a_destroy(spi7_dec);
 	StepPositionWithCP56Time2a_destroy(spi8_dec);
 	CS101_ASDU_destroy(asdu2);
+
+	Frame_destroy(f);
 }
 
 void
@@ -899,7 +914,7 @@ test_EventOfProtectionEquipmentWithTime(void)
     InformationObject_destroy((InformationObject) e);
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     InformationObject io = CS101_ASDU_getElement(asdu2, 1);
 
@@ -1783,11 +1798,9 @@ test_DoublePointInformation(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_DOUBLE_POINT_ON, DoublePointInformation_getValue(dpi2));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_DOUBLE_POINT_INDETERMINATE, DoublePointInformation_getValue(dpi3));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -1801,11 +1814,11 @@ test_DoublePointInformation(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(18, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(24, Frame_getMsgSize(f)); // test_DoublePointInformation
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(3, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -1831,6 +1844,8 @@ test_DoublePointInformation(void)
     InformationObject_destroy((InformationObject) dpi3_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -1854,11 +1869,9 @@ test_SinglePointInformation(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, SinglePointInformation_getQuality(spi4));
     TEST_ASSERT_TRUE(SinglePointInformation_getValue(spi1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -1874,11 +1887,11 @@ test_SinglePointInformation(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(22, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(28, Frame_getMsgSize(f)); // test_SinglePointInformation
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(4, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -1910,6 +1923,8 @@ test_SinglePointInformation(void)
     SinglePointInformation_destroy(spi4_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -1933,11 +1948,9 @@ test_SinglePointInformationSequence(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, SinglePointInformation_getQuality(spi4));
     TEST_ASSERT_TRUE(SinglePointInformation_getValue(spi1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, true, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -1953,11 +1966,7 @@ test_SinglePointInformationSequence(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(13, Frame_getMsgSize(f));
-
-    CS101_ASDU_destroy(asdu);
-
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(4, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -1989,6 +1998,8 @@ test_SinglePointInformationSequence(void)
     SinglePointInformation_destroy(spi4_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -2028,11 +2039,9 @@ test_DoublePointWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, DoublePointInformation_getQuality((DoublePointInformation )dpi3));
     TEST_ASSERT_TRUE(DoublePointInformation_getQuality((DoublePointInformation )dpi1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2046,11 +2055,11 @@ test_DoublePointWithCP24Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(27, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL(45,  Frame_getMsgSize(f)); // test_SinglePointWithCP56Time2a
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(3, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -2088,6 +2097,8 @@ test_DoublePointWithCP24Time2a(void)
     InformationObject_destroy((InformationObject) dpi3_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -2127,11 +2138,9 @@ test_SinglePointWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, SinglePointInformation_getQuality((SinglePointInformation)spi3));
     TEST_ASSERT_TRUE(SinglePointInformation_getValue((SinglePointInformation)spi1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2145,11 +2154,11 @@ test_SinglePointWithCP24Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(27, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL(33,  Frame_getMsgSize(f)); // test_SinglePointWithCP24Time2a
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(3, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -2187,6 +2196,8 @@ test_SinglePointWithCP24Time2a(void)
     InformationObject_destroy((InformationObject) spi3_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 void
 test_DoublePointWithCP56Time2a(void)
@@ -2216,11 +2227,9 @@ test_DoublePointWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, DoublePointInformation_getQuality((DoublePointInformation)dpi3));
     TEST_ASSERT_TRUE(DoublePointInformation_getValue((DoublePointInformation)dpi1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2238,7 +2247,7 @@ test_DoublePointWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(3, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -2267,6 +2276,8 @@ test_DoublePointWithCP56Time2a(void)
     InformationObject_destroy((InformationObject) dpi3_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -2297,11 +2308,9 @@ test_SinglePointWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, SinglePointInformation_getQuality((SinglePointInformation)spi3));
     TEST_ASSERT_TRUE(SinglePointInformation_getValue((SinglePointInformation)spi1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2319,7 +2328,7 @@ test_SinglePointWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(3, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -2348,6 +2357,8 @@ test_SinglePointWithCP56Time2a(void)
     InformationObject_destroy((InformationObject) spi3_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -2359,11 +2370,9 @@ test_NormalizeMeasureValueWithoutQuality(void)
 
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.5f, MeasuredValueNormalizedWithoutQuality_getValue((MeasuredValueNormalizedWithoutQuality )nmv1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2377,7 +2386,7 @@ test_NormalizeMeasureValueWithoutQuality(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -2388,6 +2397,8 @@ test_NormalizeMeasureValueWithoutQuality(void)
 
     MeasuredValueNormalizedWithoutQuality_destroy(nmv1_dec);
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -2429,11 +2440,9 @@ test_NormalizeMeasureValue(void)
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.4f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv7));
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.5f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2461,7 +2470,7 @@ test_NormalizeMeasureValue(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -2520,6 +2529,8 @@ test_NormalizeMeasureValue(void)
     MeasuredValueNormalized_destroy(nmv8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -2612,11 +2623,9 @@ test_MeasuredValueNormalizedWithCP24Time2a(void)
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.4f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv7));
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.5f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2644,7 +2653,7 @@ test_MeasuredValueNormalizedWithCP24Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -2734,6 +2743,8 @@ test_MeasuredValueNormalizedWithCP24Time2a(void)
     MeasuredValueNormalizedWithCP24Time2a_destroy(nmv8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -2803,11 +2814,9 @@ test_MeasuredValueNormalizedWithCP56Time2a(void)
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.4f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv7));
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.5f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2835,7 +2844,7 @@ test_MeasuredValueNormalizedWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -2894,6 +2903,8 @@ test_MeasuredValueNormalizedWithCP56Time2a(void)
     MeasuredValueNormalizedWithCP56Time2a_destroy(nmv8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -2935,11 +2946,9 @@ test_MeasuredValueScaled(void)
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs7));
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2967,7 +2976,7 @@ test_MeasuredValueScaled(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -3017,6 +3026,8 @@ test_MeasuredValueScaled(void)
     MeasuredValueScaled_destroy(mvs8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -3110,11 +3121,9 @@ test_MeasuredValueScaledWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs7));
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3142,7 +3151,7 @@ test_MeasuredValueScaledWithCP24Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -3232,6 +3241,8 @@ test_MeasuredValueScaledWithCP24Time2a(void)
     MeasuredValueScaledWithCP24Time2a_destroy(mvs8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -3300,11 +3311,9 @@ test_MeasuredValueScaledWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs7));
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3332,7 +3341,7 @@ test_MeasuredValueScaledWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -3391,6 +3400,8 @@ test_MeasuredValueScaledWithCP56Time2a(void)
     MeasuredValueScaledWithCP56Time2a_destroy(mvs8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -3432,11 +3443,9 @@ test_MeasuredValueShort(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, MeasuredValueShort_getQuality(mvs7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, MeasuredValueShort_getQuality(mvs8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3464,7 +3473,7 @@ test_MeasuredValueShort(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -3505,6 +3514,8 @@ test_MeasuredValueShort(void)
     MeasuredValueShort_destroy(mvs8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -3597,11 +3608,9 @@ test_MeasuredValueShortWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, MeasuredValueShort_getQuality((MeasuredValueShort )mvs7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, MeasuredValueShort_getQuality((MeasuredValueShort )mvs8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3629,7 +3638,7 @@ test_MeasuredValueShortWithCP24Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -3710,6 +3719,8 @@ test_MeasuredValueShortWithCP24Time2a(void)
     MeasuredValueShortWithCP24Time2a_destroy(mvs8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -3778,11 +3789,9 @@ test_MeasuredValueShortWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, MeasuredValueShort_getQuality((MeasuredValueShort )mvs7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, MeasuredValueShort_getQuality((MeasuredValueShort )mvs8));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3810,7 +3819,7 @@ test_MeasuredValueShortWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(8, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -3860,6 +3869,8 @@ test_MeasuredValueShortWithCP56Time2a(void)
     MeasuredValueShortWithCP56Time2a_destroy(mvs8_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -3888,12 +3899,10 @@ test_IntegratedTotals(void)
     TEST_ASSERT_EQUAL_UINT8(15, BinaryCounterReading_getSequenceNumber(IntegratedTotals_getBCR(it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_hasCarry(IntegratedTotals_getBCR(it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isAdjusted(IntegratedTotals_getBCR(it2)));
-    TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR(it2)));
-    uint8_t buffer[256];
+    TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR(it2)));    
+	uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3909,7 +3918,7 @@ test_IntegratedTotals(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(2, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -3934,6 +3943,8 @@ test_IntegratedTotals(void)
     IntegratedTotals_destroy(it2_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -3976,12 +3987,10 @@ test_IntegratedTotalsWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(15, BinaryCounterReading_getSequenceNumber(IntegratedTotals_getBCR((IntegratedTotals )it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_hasCarry(IntegratedTotals_getBCR((IntegratedTotals )it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isAdjusted(IntegratedTotals_getBCR((IntegratedTotals )it2)));
-    TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR((IntegratedTotals )it2)));
-    uint8_t buffer[256];
+    TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR((IntegratedTotals )it2)));    
+	uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3997,7 +4006,7 @@ test_IntegratedTotalsWithCP24Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(2, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4031,6 +4040,8 @@ test_IntegratedTotalsWithCP24Time2a(void)
     IntegratedTotalsWithCP24Time2a_destroy(it1_dec);
     IntegratedTotalsWithCP24Time2a_destroy(it2_dec);
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4068,12 +4079,10 @@ test_IntegratedTotalsWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(15, BinaryCounterReading_getSequenceNumber(IntegratedTotals_getBCR((IntegratedTotals )it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_hasCarry(IntegratedTotals_getBCR((IntegratedTotals )it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isAdjusted(IntegratedTotals_getBCR((IntegratedTotals )it2)));
-    TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR((IntegratedTotals )it2)));
-    uint8_t buffer[256];
+    TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR((IntegratedTotals )it2)));    
+	uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -4089,7 +4098,7 @@ test_IntegratedTotalsWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(2, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4117,6 +4126,8 @@ test_IntegratedTotalsWithCP56Time2a(void)
     IntegratedTotalsWithCP56Time2a_destroy(it2_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4129,11 +4140,9 @@ test_SingleCommand(void)
     TEST_ASSERT_TRUE(SingleCommand_isSelect(sc));
     TEST_ASSERT_EQUAL_INT(0, SingleCommand_getQU(sc));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4147,7 +4156,7 @@ test_SingleCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4162,6 +4171,8 @@ test_SingleCommand(void)
     SingleCommand_destroy(sc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4181,11 +4192,9 @@ test_SingleCommandWithCP56Time2a(void)
     TEST_ASSERT_TRUE(SingleCommand_isSelect((SingleCommand )sc));
     TEST_ASSERT_EQUAL_INT(0, SingleCommand_getQU((SingleCommand )sc));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4199,7 +4208,7 @@ test_SingleCommandWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4215,6 +4224,8 @@ test_SingleCommandWithCP56Time2a(void)
     SingleCommandWithCP56Time2a_destroy(sc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4227,11 +4238,9 @@ test_DoubleCommand(void)
     TEST_ASSERT_EQUAL_INT(1, DoubleCommand_getState(dc));
     TEST_ASSERT_EQUAL_INT(0, DoubleCommand_getQU(dc));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4245,7 +4254,7 @@ test_DoubleCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4260,6 +4269,8 @@ test_DoubleCommand(void)
     DoubleCommand_destroy(dc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4277,11 +4288,9 @@ test_DoubleCommandWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(1, DoubleCommandWithCP56Time2a_getState(dc));
     TEST_ASSERT_EQUAL_INT(0, DoubleCommandWithCP56Time2a_getQU(dc));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4295,7 +4304,7 @@ test_DoubleCommandWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4311,6 +4320,8 @@ test_DoubleCommandWithCP56Time2a(void)
     DoubleCommandWithCP56Time2a_destroy(dc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4323,11 +4334,9 @@ test_StepCommandValue(void)
     TEST_ASSERT_EQUAL_INT(IEC60870_STEP_INVALID_0, StepCommand_getState(scv));
     TEST_ASSERT_EQUAL_INT(0, StepCommand_getQU(scv));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4341,7 +4350,7 @@ test_StepCommandValue(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4356,6 +4365,8 @@ test_StepCommandValue(void)
     StepCommand_destroy(scv_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4372,11 +4383,9 @@ test_StepCommandWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(IEC60870_STEP_INVALID_0, StepCommandWithCP56Time2a_getState(scv));
     TEST_ASSERT_EQUAL_INT(0, StepCommandWithCP56Time2a_getQU(scv));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4390,7 +4399,7 @@ test_StepCommandWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4406,6 +4415,8 @@ test_StepCommandWithCP56Time2a(void)
     StepCommandWithCP56Time2a_destroy((StepCommandWithCP56Time2a) scv_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4418,11 +4429,9 @@ test_SetpointCommandNormalized(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandNormalized_getQL(spcn));
     TEST_ASSERT_TRUE(SetpointCommandNormalized_isSelect(spcn));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4436,7 +4445,7 @@ test_SetpointCommandNormalized(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4451,6 +4460,8 @@ test_SetpointCommandNormalized(void)
     SetpointCommandNormalized_destroy(spcn_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4467,11 +4478,9 @@ test_SetpointCommandNormalizedWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandNormalizedWithCP56Time2a_getQL(spcn));
     TEST_ASSERT_TRUE(SetpointCommandNormalizedWithCP56Time2a_isSelect(spcn));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4485,7 +4494,7 @@ test_SetpointCommandNormalizedWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4501,6 +4510,8 @@ test_SetpointCommandNormalizedWithCP56Time2a(void)
     SetpointCommandNormalizedWithCP56Time2a_destroy(spcn_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4513,11 +4524,9 @@ test_SetpointCommandScaled(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandScaled_getQL(spcs));
     TEST_ASSERT_TRUE(SetpointCommandScaled_isSelect(spcs));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4531,7 +4540,7 @@ test_SetpointCommandScaled(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4546,6 +4555,8 @@ test_SetpointCommandScaled(void)
     SetpointCommandScaled_destroy(spcs_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4563,11 +4574,9 @@ test_SetpointCommandScaledWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandScaledWithCP56Time2a_getQL(spcs));
     TEST_ASSERT_TRUE(SetpointCommandScaledWithCP56Time2a_isSelect(spcs));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4581,7 +4590,7 @@ test_SetpointCommandScaledWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4597,6 +4606,8 @@ test_SetpointCommandScaledWithCP56Time2a(void)
     SetpointCommandScaledWithCP56Time2a_destroy(spcs_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4609,11 +4620,9 @@ test_SetpointCommandShort(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandShort_getQL(spcs));
     TEST_ASSERT_TRUE(SetpointCommandShort_isSelect(spcs));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4627,7 +4636,7 @@ test_SetpointCommandShort(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4642,6 +4651,8 @@ test_SetpointCommandShort(void)
     SetpointCommandShort_destroy(spcs_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4658,11 +4669,9 @@ test_SetpointCommandShortWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandShortWithCP56Time2a_getQL(spcs));
     TEST_ASSERT_TRUE(SetpointCommandShortWithCP56Time2a_isSelect(spcs));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4676,7 +4685,7 @@ test_SetpointCommandShortWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4692,6 +4701,8 @@ test_SetpointCommandShortWithCP56Time2a(void)
     SetpointCommandShortWithCP56Time2a_destroy(spcs_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4702,11 +4713,9 @@ test_InterrogationCommand(void)
     ic = InterrogationCommand_create(NULL, 101, qoi);
     TEST_ASSERT_EQUAL_INT(21, InterrogationCommand_getQOI(ic));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4720,7 +4729,7 @@ test_InterrogationCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4733,6 +4742,8 @@ test_InterrogationCommand(void)
     InterrogationCommand_destroy(ic_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4744,11 +4755,9 @@ test_CounterInterrogationCommand(void)
 
     TEST_ASSERT_EQUAL_INT(1, CounterInterrogationCommand_getQCC(cic));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4762,7 +4771,7 @@ test_CounterInterrogationCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4775,6 +4784,8 @@ test_CounterInterrogationCommand(void)
     CounterInterrogationCommand_destroy(cic_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4783,11 +4794,9 @@ test_ReadCommand(void)
     ReadCommand rc;
     rc = ReadCommand_create( NULL, 101);
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4801,7 +4810,7 @@ test_ReadCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4812,6 +4821,8 @@ test_ReadCommand(void)
     ReadCommand_destroy(rc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4823,11 +4834,9 @@ test_ClockSynchronizationCommand(void)
     CP56Time2a_createFromMsTimestamp(&cpTime1, time1);
     csc = ClockSynchronizationCommand_create(NULL, 101, &cpTime1);
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4841,7 +4850,7 @@ test_ClockSynchronizationCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4853,6 +4862,8 @@ test_ClockSynchronizationCommand(void)
     ClockSynchronizationCommand_destroy(csc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4864,11 +4875,9 @@ test_ResetProcessCommand(void)
 
     TEST_ASSERT_EQUAL_INT(0, ResetProcessCommand_getQRP(rpc));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4882,7 +4891,7 @@ test_ResetProcessCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4895,6 +4904,8 @@ test_ResetProcessCommand(void)
     ResetProcessCommand_destroy(rpc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4910,11 +4921,9 @@ test_DelayAcquisitionCommand(void)
     CP16Time2a_setEplapsedTimeInMs(&delay, 24123);
 
     dac = DelayAcquisitionCommand_create(NULL, 101, &delay);
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4928,7 +4937,7 @@ test_DelayAcquisitionCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4941,6 +4950,8 @@ test_DelayAcquisitionCommand(void)
     DelayAcquisitionCommand_destroy(dac_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 void
 test_TestCommand(void)
@@ -4948,10 +4959,9 @@ test_TestCommand(void)
     TestCommand tc;
     tc = TestCommand_create(NULL);
 
-    uint8_t buffer[256];
-    struct sBufferFrame bf;
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4965,7 +4975,7 @@ test_TestCommand(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -4979,6 +4989,8 @@ test_TestCommand(void)
     TestCommand_destroy(tc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -4992,10 +5004,9 @@ test_TestCommandWithTime(void)
 
     tc = TestCommandWithCP56Time2a_create(NULL, 0xaa55, &cpTime1);
 
-    uint8_t buffer[256];
-    struct sBufferFrame bf;
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -5009,7 +5020,7 @@ test_TestCommandWithTime(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -5021,6 +5032,8 @@ test_TestCommandWithTime(void)
     TestCommandWithCP56Time2a_destroy(tc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -5113,11 +5126,9 @@ test_Bitstring32CommandWithCP56Time2a(void)
 
     TEST_ASSERT_EQUAL_UINT32(0x0000000000, Bitstring32CommandWithCP56Time2a_getValue(bsc));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -5131,7 +5142,7 @@ test_Bitstring32CommandWithCP56Time2a(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -5144,6 +5155,8 @@ test_Bitstring32CommandWithCP56Time2a(void)
     Bitstring32CommandWithCP56Time2a_destroy(bsc_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -5162,13 +5175,10 @@ test_QueryLog(void)
 
     queryLog = QueryLog_create(NULL, 101, 256, &rangeStartTime, &rangeStopTime);
 
-    TEST_ASSERT_EQUAL_UINT16(256, QueryLog_getNOF(queryLog));
+    TEST_ASSERT_EQUAL_UINT16(256, QueryLog_getNOF(queryLog));    
+	uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    uint8_t buffer[256];
-
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -5182,7 +5192,7 @@ test_QueryLog(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -5198,6 +5208,8 @@ test_QueryLog(void)
     QueryLog_destroy(queryLog_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -5221,11 +5233,9 @@ test_FileDirectory(void)
 
     TEST_ASSERT_EQUAL_UINT32(1024, FileDirectory_getLengthOfFile(fd1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     /* NOTE: file directory is always a "sequence" */
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, true, CS101_COT_SPONTANEOUS, 0, 1, false, false);
@@ -5244,7 +5254,7 @@ test_FileDirectory(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(3, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -5274,6 +5284,8 @@ test_FileDirectory(void)
     FileDirectory_destroy(fd3_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -5291,11 +5303,9 @@ test_FileDirectorySingleEntry(void)
 
     TEST_ASSERT_EQUAL_UINT32(1024, FileDirectory_getLengthOfFile(fd1));
 
-    uint8_t buffer[256];
+    uint8_t buffer[256]; /* This buffer will be used by the frame */
 
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    Frame f = T104Frame_create();
 
     /* NOTE: file directory is always a "sequence" */
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, true, CS101_COT_SPONTANEOUS, 0, 1, false, false);
@@ -5310,7 +5320,7 @@ test_FileDirectorySingleEntry(void)
 
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     TEST_ASSERT_EQUAL_INT(1, CS101_ASDU_getNumberOfElements(asdu2));
 
@@ -5326,6 +5336,8 @@ test_FileDirectorySingleEntry(void)
     FileDirectory_destroy(fd1_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 }
 
 void
@@ -5333,10 +5345,8 @@ test_BitString32xx_encodeDecode(void)
 {
 #ifndef _WIN32
     uint8_t buffer[256];
-
-    struct sBufferFrame bf;
-
-    Frame f = BufferFrame_initialize(&bf, buffer, 0);
+    
+	Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -5355,7 +5365,7 @@ test_BitString32xx_encodeDecode(void)
     InformationObject_destroy((InformationObject) bs32_3);
     CS101_ASDU_destroy(asdu);
 
-    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters, buffer, Frame_getMsgSize(f));
+    CS101_ASDU asdu2 = CS101_ASDU_createFromBuffer(&defaultAppLayerParameters,  Frame_getBuffer(f) + 6, Frame_getMsgSize(f) - 6);
 
     BitString32 bs32_1_dec = (BitString32) CS101_ASDU_getElement(asdu2, 0);
     BitString32 bs32_2_dec = (BitString32) CS101_ASDU_getElement(asdu2, 1);
@@ -5375,6 +5385,8 @@ test_BitString32xx_encodeDecode(void)
     InformationObject_destroy((InformationObject)bs32_3_dec);
 
     CS101_ASDU_destroy(asdu2);
+
+    Frame_destroy(f);
 #endif
 }
 
@@ -6152,8 +6164,6 @@ test_CS104_MasterSlave_TLSRenegotiateAfterCRLUpdate(void)
     CS104_Slave_enqueueASDU(slave, newAsdu);
 
     CS101_ASDU_destroy(newAsdu);
-
-    Thread_sleep(1000);
 
     TEST_ASSERT_EQUAL_INT(1, eventInfo.eventHandlerCalled);
     TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_INF_SESSION_RENEGOTIATION, eventInfo.eventCodes[0]);

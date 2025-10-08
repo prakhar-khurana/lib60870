@@ -19,6 +19,7 @@
 
 #include "../../inc/internal/aprofile_internal.h"
 #include "lib_memory.h"
+#include "cs104_frame.h"
 
 struct sAProfileContext {
     int dummy;

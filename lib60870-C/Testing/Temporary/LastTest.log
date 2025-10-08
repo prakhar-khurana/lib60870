@@ -1,173 +1,114 @@
-Start testing: Oct 03 19:10 India Standard Time
+Start testing: Oct 05 11:38 India Standard Time
 ----------------------------------------------------------
 1/1 Testing: all_tests
 1/1 Test: all_tests
 Command: "C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/Debug/tests.exe"
 Directory: C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests
-"all_tests" start time: Oct 03 19:10 India Standard Time
+"all_tests" start time: Oct 05 11:38 India Standard Time
 Output:
 ----------------------------------------------------------
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7371:test_version_number:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7372:test_CS104_Slave_CreateDestroy:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7373:test_CS104_MasterSlave_CreateDestroyLoop:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7374:test_CS104_Connection_CreateDestroy:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7375:test_CS104_MasterSlave_CreateDestroy:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7376:test_CP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7377:test_CP56Time2aToMsTimestamp:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7378:test_CP56Time2aConversionFunctions:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7379:test_StepPositionInformation:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7380:test_addMaxNumberOfIOsToASDU:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7381:test_SingleEventType:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7383:test_SinglePointInformation:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7384:test_SinglePointInformationSequence:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7385:test_SinglePointWithCP24Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7386:test_SinglePointWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7388:test_DoublePointInformation:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7389:test_DoublePointWithCP24Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7390:test_DoublePointWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7392:test_NormalizeMeasureValueWithoutQuality:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7393:test_NormalizeMeasureValue:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7394:test_MeasuredValueNormalizedWithCP24Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7395:test_MeasuredValueNormalizedWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7397:test_MeasuredValueScaled:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7398:test_MeasuredValueScaledWithCP24Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7399:test_MeasuredValueScaledWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7401:test_MeasuredValueShort:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7402:test_MeasuredValueShortWithCP24Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7403:test_MeasuredValueShortWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7405:test_StepPositionInformation:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7406:test_StepPositionWithCP24Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7407:test_StepPositionWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7409:test_IntegratedTotals:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7410:test_IntegratedTotalsWithCP24Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7411:test_IntegratedTotalsWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7413:test_SingleCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7414:test_SingleCommandWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7416:test_DoubleCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7417:test_DoubleCommandWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7419:test_StepCommandValue:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7420:test_StepCommandWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7422:test_SetpointCommandNormalized:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7423:test_SetpointCommandNormalizedWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7425:test_SetpointCommandScaled:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7426:test_SetpointCommandScaledWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7428:test_SetpointCommandShort:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7429:test_SetpointCommandShortWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7431:test_InterrogationCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7432:test_CounterInterrogationCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7434:test_ReadCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7435:test_ClockSynchronizationCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7436:test_ResetProcessCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7437:test_DelayAcquisitionCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7438:test_TestCommand:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7439:test_TestCommandWithTime:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7441:test_BitString32:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7442:test_Bitstring32CommandWithCP56Time2a:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7444:test_QueryLog:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7446:test_FileDirectory:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7447:test_FileDirectorySingleEntry:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7449:test_BitString32xx_encodeDecode:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7450:test_EventOfProtectionEquipmentWithTime:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7451:test_IpAddressHandling:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7453:test_CS104SlaveConnectionIsRedundancyGroup:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7454:test_CS104SlaveSingleRedundancyGroup:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7455:test_CS104SlaveSingleRedundancyGroupMultipleConnections:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7457:test_CS104SlaveEventQueue1:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7458:test_CS104SlaveEventQueueOverflow:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7459:test_CS104SlaveEventQueueOverflow2:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7460:test_CS104SlaveEventQueueCheckCapacity:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7461:test_CS104SlaveEventQueueOverflow3:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7463:test_CS104_Connection_ConnectTimeout:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7465:test_CS104_Connection_UseAfterClose:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7466:test_CS104_Connection_UseAfterServerClosedConnection:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7468:test_CS104_Connection_async_success:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7469:test_CS104_Connection_async_timeout:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7471:test_CS101_ASDU_addObjectOfWrongType:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7472:test_CS101_ASDU_addUntilOverflow:PASS
-[SECURITY EVENT] Info: Session established with cipher suite TLS-RSA-WITH-AES-128-CBC-SHA256 (t: 0, c: 16, version: TLS 1.2 remote-ip: 127.0.0.1:58450)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7475:test_CS104_MasterSlave_TLSConnectSuccess:PASS
-[SECURITY EVENT] Info: Session established with cipher suite TLS-RSA-WITH-AES-128-CBC-SHA256 (t: 0, c: 16, version: TLS 1.2 remote-ip: 127.0.0.1:58453)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7476:test_CS104_MasterSlave_TLSConnectSuccessWithoutSeparateCACert:PASS
-[SECURITY EVENT] Alarm: Algorithm not supported (t: 2, c: 1, version: TLS 1.2 remote-ip: 127.0.0.1:58455)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7477:test_CS104_MasterSlave_TLSConnectFails:PASS
-[SECURITY EVENT] Alarm: Unsecure communication (t: 2, c: 2, version: TLS 1.1 remote-ip: 127.0.0.1:58456)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7478:test_CS104_MasterSlave_TLSVersionMismatch:PASS
-[SECURITY EVENT] Alarm: expired certificate (t: 2, c: 11, version: TLS 1.2 remote-ip: 127.0.0.1:58457)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58457)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7479:test_CS104_MasterSlave_TLSCertificateExpired:PASS
-[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:58459)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58459)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7480:test_CS104_MasterSlave_TLSCertificateRevoked:PASS
-[SECURITY EVENT] Info: Session established with cipher suite TLS-RSA-WITH-AES-128-CBC-SHA256 (t: 0, c: 16, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Info: session renegotiation started (t: 0, c: 10, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] TLS session renegotiation completed (t: 0, c: 10, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: TLS 1.2 remote-ip: 127.0.0.1:58460)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6158:test_CS104_MasterSlave_TLSRenegotiateAfterCRLUpdate:FAIL: Expected 1 Was 36
-[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:58462)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58462)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6218:test_CS104_MasterSlave_TLSCertificateRevokedBeforeRenegotiation:FAIL: Expected TRUE Was FALSE
-[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:58463)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58463)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6300:test_CS104_MasterSlave_TLSCertificateRevokedBeforeReconnect:FAIL: Expected TRUE Was FALSE
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58464)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7484:test_CS104_MasterSlave_TLSUnknownCertificate:PASS
-[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:58465)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58465)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6412:test_CS104_MasterSlave_TLSUseSessionResumption:FAIL: Expected TRUE Was FALSE
-[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:58466)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58466)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6484:test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtClient:FAIL: Expected TRUE Was FALSE
-[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:58467)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58467)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6557:test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtServer:FAIL: Expected TRUE Was FALSE
-[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:58469)
-[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:58469)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6618:test_CS104_MasterSlave_TLSReuseConfigurationWithSessionResumption:FAIL: Expected TRUE Was FALSE
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7491:test_ASDUsetGetNumberOfElements:PASS
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7492:test_CS101_ASDU_clone:PASS
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: unknown TLS version remote-ip: 127.0.0.1:58470)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6757:test_CS104SlaveUnconfirmedStoppedMode:FAIL: Expected 14 Was 0
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7496:test_ScaledNormalizedConversion:PASS
-[SECURITY EVENT] Alarm: handshake failed for unknown reason (t: 2, c: 8, version: unknown TLS version remote-ip: 127.0.0.1:58471)
-C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7498:test_CS104Connection_cannotWriteToSocketWhenNotConnected:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7369:test_version_number:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7370:test_CS104_Slave_CreateDestroy:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7371:test_CS104_MasterSlave_CreateDestroyLoop:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7372:test_CS104_Connection_CreateDestroy:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7373:test_CS104_MasterSlave_CreateDestroy:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7374:test_CP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7375:test_CP56Time2aToMsTimestamp:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7376:test_CP56Time2aConversionFunctions:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7377:test_StepPositionInformation:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7378:test_addMaxNumberOfIOsToASDU:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7379:test_SingleEventType:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7381:test_SinglePointInformation:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7382:test_SinglePointInformationSequence:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7383:test_SinglePointWithCP24Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7384:test_SinglePointWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7386:test_DoublePointInformation:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7387:test_DoublePointWithCP24Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7388:test_DoublePointWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7390:test_NormalizeMeasureValueWithoutQuality:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7391:test_NormalizeMeasureValue:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7392:test_MeasuredValueNormalizedWithCP24Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7393:test_MeasuredValueNormalizedWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7395:test_MeasuredValueScaled:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7396:test_MeasuredValueScaledWithCP24Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7397:test_MeasuredValueScaledWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7399:test_MeasuredValueShort:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7400:test_MeasuredValueShortWithCP24Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7401:test_MeasuredValueShortWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7403:test_StepPositionInformation:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7404:test_StepPositionWithCP24Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7405:test_StepPositionWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7407:test_IntegratedTotals:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7408:test_IntegratedTotalsWithCP24Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7409:test_IntegratedTotalsWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7411:test_SingleCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7412:test_SingleCommandWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7414:test_DoubleCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7415:test_DoubleCommandWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7417:test_StepCommandValue:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7418:test_StepCommandWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7420:test_SetpointCommandNormalized:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7421:test_SetpointCommandNormalizedWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7423:test_SetpointCommandScaled:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7424:test_SetpointCommandScaledWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7426:test_SetpointCommandShort:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7427:test_SetpointCommandShortWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7429:test_InterrogationCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7430:test_CounterInterrogationCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7432:test_ReadCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7433:test_ClockSynchronizationCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7434:test_ResetProcessCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7435:test_DelayAcquisitionCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7436:test_TestCommand:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7437:test_TestCommandWithTime:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7439:test_BitString32:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7440:test_Bitstring32CommandWithCP56Time2a:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7442:test_QueryLog:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7444:test_FileDirectory:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7445:test_FileDirectorySingleEntry:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7447:test_BitString32xx_encodeDecode:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7448:test_EventOfProtectionEquipmentWithTime:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7449:test_IpAddressHandling:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7451:test_CS104SlaveConnectionIsRedundancyGroup:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7452:test_CS104SlaveSingleRedundancyGroup:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7453:test_CS104SlaveSingleRedundancyGroupMultipleConnections:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7455:test_CS104SlaveEventQueue1:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7456:test_CS104SlaveEventQueueOverflow:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7457:test_CS104SlaveEventQueueOverflow2:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7458:test_CS104SlaveEventQueueCheckCapacity:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7459:test_CS104SlaveEventQueueOverflow3:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7461:test_CS104_Connection_ConnectTimeout:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7463:test_CS104_Connection_UseAfterClose:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7464:test_CS104_Connection_UseAfterServerClosedConnection:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7466:test_CS104_Connection_async_success:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7467:test_CS104_Connection_async_timeout:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7469:test_CS101_ASDU_addObjectOfWrongType:PASS
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7470:test_CS101_ASDU_addUntilOverflow:PASS
+[SECURITY EVENT] Info: Session established with cipher suite TLS-RSA-WITH-AES-128-CBC-SHA256 (t: 0, c: 16, version: TLS 1.2 remote-ip: 127.0.0.1:64617)
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7473:test_CS104_MasterSlave_TLSConnectSuccess:PASS
+[SECURITY EVENT] Info: Session established with cipher suite TLS-RSA-WITH-AES-128-CBC-SHA256 (t: 0, c: 16, version: TLS 1.2 remote-ip: 127.0.0.1:64618)
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7474:test_CS104_MasterSlave_TLSConnectSuccessWithoutSeparateCACert:PASS
+[SECURITY EVENT] Alarm: Algorithm not supported (t: 2, c: 1, version: TLS 1.2 remote-ip: 127.0.0.1:64620)
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7475:test_CS104_MasterSlave_TLSConnectFails:PASS
+[SECURITY EVENT] Alarm: Unsecure communication (t: 2, c: 2, version: TLS 1.1 remote-ip: 127.0.0.1:64621)
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7476:test_CS104_MasterSlave_TLSVersionMismatch:PASS
+[SECURITY EVENT] Alarm: expired certificate (t: 2, c: 11, version: TLS 1.2 remote-ip: 127.0.0.1:64622)
+[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:64622)
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7477:test_CS104_MasterSlave_TLSCertificateExpired:PASS
+[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:64623)
+[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:64623)
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:7478:test_CS104_MasterSlave_TLSCertificateRevoked:PASS
+[SECURITY EVENT] Info: Session established with cipher suite TLS-RSA-WITH-AES-128-CBC-SHA256 (t: 0, c: 16, version: TLS 1.2 remote-ip: 127.0.0.1:64625)
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6157:test_CS104_MasterSlave_TLSRenegotiateAfterCRLUpdate:FAIL: Expected 10 Was 16
+[SECURITY EVENT] Alarm: revoked certificate (t: 2, c: 12, version: TLS 1.2 remote-ip: 127.0.0.1:64626)
+[SECURITY EVENT] Alarm: Certificate verification failed (t: 2, c: 6, version: TLS 1.2 remote-ip: 127.0.0.1:64626)
+C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\all_tests.c:6216:test_CS104_MasterSlave_TLSCertificateRevokedBeforeRenegotiation:FAIL: Expected TRUE Was FALSE
 <end of output>
-Test time = 150.45 sec
+Test time = 143.33 sec
 ----------------------------------------------------------
 Test Failed.
-"all_tests" end time: Oct 03 19:13 India Standard Time
-"all_tests" time elapsed: 00:02:30
+"all_tests" end time: Oct 05 11:40 India Standard Time
+"all_tests" time elapsed: 00:02:23
 ----------------------------------------------------------
 
-End testing: Oct 03 19:13 India Standard Time
+End testing: Oct 05 11:40 India Standard Time

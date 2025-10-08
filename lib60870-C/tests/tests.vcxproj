@@ -103,12 +103,12 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE="mbedtls_config.h";CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE="mbedtls_config.h";UNITY_INCLUDE_CONFIG_H;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\";CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\";UNITY_INCLUDE_CONFIG_H;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\z005653n\Desktop\lib60870\lib60870-C\config;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\file-service;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\inc\api;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\inc\internal;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\common\inc;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\inc;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\tls\mbedtls;C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\include;C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\.\unity;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -119,6 +119,18 @@
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/z005653n/Desktop/lib60870/lib60870-C/src/Debug/lib60870.dll C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
     <Link>
       <AdditionalDependencies>..\src\Debug\lib60870.lib;ws2_32.lib;iphlpapi.lib;bcrypt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -155,14 +167,14 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE="mbedtls_config.h";CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE="mbedtls_config.h";UNITY_INCLUDE_CONFIG_H;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\";CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\";UNITY_INCLUDE_CONFIG_H;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\z005653n\Desktop\lib60870\lib60870-C\config;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\file-service;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\inc\api;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\inc\internal;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\common\inc;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\inc;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\tls\mbedtls;C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\include;C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\.\unity;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -173,6 +185,18 @@
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/z005653n/Desktop/lib60870/lib60870-C/src/Release/lib60870.dll C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/Release
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
     <Link>
       <AdditionalDependencies>..\src\Release\lib60870.lib;ws2_32.lib;iphlpapi.lib;bcrypt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -209,14 +233,14 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE="mbedtls_config.h";CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE="mbedtls_config.h";UNITY_INCLUDE_CONFIG_H;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\";CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\";UNITY_INCLUDE_CONFIG_H;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\z005653n\Desktop\lib60870\lib60870-C\config;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\file-service;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\inc\api;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\inc\internal;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\common\inc;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\inc;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\tls\mbedtls;C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\include;C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\.\unity;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -227,6 +251,18 @@
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/z005653n/Desktop/lib60870/lib60870-C/src/MinSizeRel/lib60870.dll C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/MinSizeRel
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
     <Link>
       <AdditionalDependencies>..\src\MinSizeRel\lib60870.lib;ws2_32.lib;iphlpapi.lib;bcrypt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -264,12 +300,12 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE="mbedtls_config.h";CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE="mbedtls_config.h";UNITY_INCLUDE_CONFIG_H;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\";CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CONFIG_CS104_APROFILE=1;CONFIG_CS104_SUPPORT_TLS=1;MBEDTLS_CONFIG_FILE=\"mbedtls_config.h\";UNITY_INCLUDE_CONFIG_H;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\z005653n\Desktop\lib60870\lib60870-C\config;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\file-service;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\inc\api;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\inc\internal;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\common\inc;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\inc;C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\hal\tls\mbedtls;C:\Users\z005653n\Desktop\lib60870\lib60870-C\dependencies\mbedtls-2.28.8\include;C:\Users\z005653n\Desktop\lib60870\lib60870-C\tests\.\unity;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -280,6 +316,18 @@
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/z005653n/Desktop/lib60870/lib60870-C/src/RelWithDebInfo/lib60870.dll C:/Users/z005653n/Desktop/lib60870/lib60870-C/tests/RelWithDebInfo
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
     <Link>
       <AdditionalDependencies>..\src\RelWithDebInfo\lib60870.lib;ws2_32.lib;iphlpapi.lib;bcrypt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -380,6 +428,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ProjectReference Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\lib60870.vcxproj">
       <Project>{7B75DD8E-B40D-39AA-B2F7-763C7E96CE72}</Project>
       <Name>lib60870</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\z005653n\Desktop\lib60870\lib60870-C\src\lib60870-shared.vcxproj">
+      <Project>{E60E7588-70DB-3CB1-B224-376DE5FBE47E}</Project>
+      <Name>lib60870-shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

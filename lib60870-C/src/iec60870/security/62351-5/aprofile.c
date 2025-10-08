@@ -16,6 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with lib60870-C.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+#include <mbedtls/ecdh.h>
+#include <mbedtls/ecp.h>
 #include "aprofile_internal.h"
 #include "cs104_frame.h"
 #include "lib_memory.h"
@@ -24,6 +28,11 @@
 #include "information_objects_internal.h"
 #include <stdio.h>
 #include <string.h>
+#include <mbedtls/gcm.h>
+#include <mbedtls/ctr_drbg.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/md.h>
+#include <mbedtls/hkdf.h>
 
 #if (CONFIG_CS104_APROFILE == 1)
 
@@ -42,7 +51,6 @@ AProfile_create(void* connection, AProfile_SendAsduCallback sendAsduCallback)
     mbedtls_ecdh_init(&self->ecdh);
     mbedtls_ctr_drbg_init(&self->ctr_drbg);
     mbedtls_entropy_init(&self->entropy);
-    mbedtls_gcm_init(&self->gcm_encrypt);
     mbedtls_gcm_init(&self->gcm_decrypt);
 
     /* Seed the random number generator */
@@ -80,7 +88,7 @@ AProfile_destroy(AProfileContext self)
 #else /* CONFIG_CS104_APROFILE == 0 */
 
 AProfileContext
-AProfile_create(void* connection, AProfile_SendAsduCallback sendAsduCallback)
+AProfile_create(void* connection, void* sendAsduCallback)
 {
     AProfileContext self = (AProfileContext) GLOBAL_CALLOC(1, sizeof(struct sAProfileContext));
     if (self) {
@@ -107,31 +115,29 @@ AProfile_onStartDT(AProfileContext self)
 
     printf("APROFILE: StartDT received, initiating key exchange\n");
 
-    ret = mbedtls_ecp_group_load(&self->ecdh.ctx.mbed_ecdh.grp, MBEDTLS_ECP_DP_SECP256R1);
+    ret = mbedtls_ecp_group_load(&self->ecdh.grp, MBEDTLS_ECP_DP_SECP256R1);
     if (ret != 0) {
-        printf("APROFILE: Failed to load ECP group\n");
+        printf("APROFILE: Failed to setup ECP group\n");
+        mbedtls_ecdh_free(&self->ecdh);
         return false;
     }
 
-    ret = mbedtls_ecdh_gen_public(&self->ecdh.ctx.mbed_ecdh.grp, &self->ecdh.ctx.mbed_ecdh.d, &self->ecdh.ctx.mbed_ecdh.Q,
-                                mbedtls_ctr_drbg_random, &self->ctr_drbg);
+    size_t olen = 0;
+    ret = mbedtls_ecdh_gen_public(&self->ecdh.grp, &self->ecdh.d, &self->ecdh.Q, mbedtls_ctr_drbg_random, &self->ctr_drbg);
     if (ret != 0) {
         printf("APROFILE: Failed to generate public key\n");
+        mbedtls_ecdh_free(&self->ecdh);
         return false;
     }
 
-    /* Export the public key */
-    size_t pubkey_len;
-    ret = mbedtls_ecp_point_write_binary(&self->ecdh.ctx.mbed_ecdh.grp, &self->ecdh.ctx.mbed_ecdh.Q,
-                                         MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_len,
-                                         self->localPublicKey, sizeof(self->localPublicKey));
-
+    ret = mbedtls_ecp_point_write_binary(&self->ecdh.grp, &self->ecdh.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &olen, self->localPublicKey, sizeof(self->localPublicKey));
     if (ret != 0) {
         printf("APROFILE: Failed to write public key\n");
+        mbedtls_ecdh_free(&self->ecdh);
         return false;
     }
 
-    self->localPublicKeyLen = pubkey_len;
+    self->localPublicKeyLen = (int)olen;
 
     /* Create and send key exchange ASDU with the public key */
     CS101_ASDU asdu = CS101_ASDU_create(NULL, false, CS101_COT_AUTHENTICATION, 0, 0, false, false);
@@ -233,6 +239,7 @@ AProfile_handleInPdu(AProfileContext self, const uint8_t* in, int inSize, const 
         if (asdu && CS101_ASDU_getTypeID(asdu) == S_RP_NA_1) {
             printf("APROFILE: Received security ASDU (S_RP_NA_1)\n");
 
+            int ret;
             for (int i = 0; i < CS101_ASDU_getNumberOfElements(asdu); i++) {
                 union uInformationObject _io;
                 SecurityPublicKey spk = (SecurityPublicKey)CS101_ASDU_getElementEx(asdu, (InformationObject)&_io, i);
@@ -243,17 +250,19 @@ AProfile_handleInPdu(AProfileContext self, const uint8_t* in, int inSize, const 
                     const uint8_t* peer_key = SecurityPublicKey_getKeyValue(spk);
                     int peer_key_len = SecurityPublicKey_getKeyLength(spk);
 
-                    int ret = mbedtls_ecp_point_read_binary(&self->ecdh.ctx.mbed_ecdh.grp, &self->ecdh.ctx.mbed_ecdh.Qp, peer_key, peer_key_len);
+                    // Use MBEDTLS_PRIVATE for lvalue access
+                    ret = mbedtls_ecdh_read_public(&self->ecdh, peer_key, peer_key_len);
                     if (ret != 0) {
                         printf("APROFILE: Failed to read peer public key\n");
+                        mbedtls_ecdh_free(&self->ecdh);
                         break;
                     }
-
                     uint8_t shared_secret[32];
                     size_t shared_secret_len;
                     ret = mbedtls_ecdh_calc_secret(&self->ecdh, &shared_secret_len, shared_secret, sizeof(shared_secret), mbedtls_ctr_drbg_random, &self->ctr_drbg);
                     if (ret != 0) {
                         printf("APROFILE: Failed to calculate shared secret\n");
+                        mbedtls_ecdh_free(&self->ecdh);
                         break;
                     }
 
@@ -264,6 +273,7 @@ AProfile_handleInPdu(AProfileContext self, const uint8_t* in, int inSize, const 
                                       session_key, sizeof(session_key));
                     if (ret != 0) {
                         printf("APROFILE: Failed to derive session key\n");
+                        mbedtls_ecdh_free(&self->ecdh);
                         break;
                     }
 
@@ -283,7 +293,6 @@ AProfile_handleInPdu(AProfileContext self, const uint8_t* in, int inSize, const 
     }
 
     if (!self->security_active || CS101_ASDU_getTypeID(CS101_ASDU_createFromBufferEx(NULL, NULL, (uint8_t*)in, inSize)) != S_SE_NA_1) {
-    if (!self->security_active) {
         *out = in;
         *outSize = inSize;
         return APROFILE_PLAINTEXT;
@@ -314,14 +323,9 @@ AProfile_handleInPdu(AProfileContext self, const uint8_t* in, int inSize, const 
     }
 
     return APROFILE_SECURE_DATA;
-
-    *out = in;
-    *outSize = inSize;
-    return APROFILE_PLAINTEXT;
 #else
     *out = in;
     *outSize = inSize;
     return APROFILE_PLAINTEXT;
 #endif
-}
 }

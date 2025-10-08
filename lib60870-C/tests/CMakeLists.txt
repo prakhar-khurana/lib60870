@@ -2,9 +2,11 @@ include_directories(
    ./unity
 )
 
+add_definitions(-DUNITY_INCLUDE_CONFIG_H)
+
 set(tests_SRCS
-   all_tests.c
-   unity/unity.c
+   "${CMAKE_CURRENT_LIST_DIR}/all_tests.c"
+   "${CMAKE_CURRENT_LIST_DIR}/unity/unity.c"
 )
 
 IF(WIN32)
@@ -46,6 +48,14 @@ add_executable(tests
 target_link_libraries(tests
     lib60870
 )
+
+if(WIN32)
+add_custom_command(TARGET tests POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    $<TARGET_FILE:lib60870-shared>
+    $<TARGET_FILE_DIR:tests>
+)
+endif()
 
 enable_testing()
 add_test(NAME all_tests COMMAND tests)

@@ -29,19 +29,20 @@ extern "C" {
 typedef struct sCS104_Connection* CS104_Connection;
 typedef struct sCS104_Slave* CS104_Slave;
 
-typedef struct
-{
-    int dummy;
+typedef struct {
+    uint32_t sessionKeyChangeInterval;
+    uint32_t challengeResponseTimeout;
 } CS104_SecurityConfig;
 
-typedef struct
-{
-    int dummy;
+typedef struct {
+    const char* privateKeyFile;
+    const char* ownCertificateFile;
+    const char* caCertificateFile;
 } CS104_CertConfig;
 
-typedef struct
-{
-    int dummy;
+typedef struct {
+    int roleId;
+    int permissions;
 } CS104_RoleConfig;
 
 typedef enum

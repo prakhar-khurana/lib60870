@@ -322,6 +322,8 @@ SecurityPublicKey_getFromBuffer(SecurityPublicKey self, CS101_AppLayerParameters
 SecurityEncryptedData
 SecurityEncryptedData_getFromBuffer(SecurityEncryptedData self, CS101_AppLayerParameters parameters, uint8_t* msg, int msgSize, int startIndex, bool isSequence);
 
+#pragma pack(push, 1)
+
 /********************************************
  * static InformationObject type definitions
  ********************************************/
@@ -1234,5 +1236,7 @@ union uInformationObject {
     struct sFileDirectory m39;
     struct sQueryLog m40;
 };
+
+#pragma pack(pop)
 
 #endif /* SRC_INC_INFORMATION_OBJECTS_INTERNAL_H_ */
