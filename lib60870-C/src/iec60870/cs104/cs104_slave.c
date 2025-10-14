@@ -2475,8 +2475,14 @@ handleASDU(MasterConnection self, CS101_ASDU asdu)
                     }
                 }
             }
+            else
+            {
+                /* No handler registered - send negative response */
+                responseNegative(asdu, self, CS101_COT_UNKNOWN_TYPE_ID);
+                messageHandled = true;
+            }
         }
-        else if (slave->resetProcessHandler == NULL)
+        else
         {
             responseCOTUnknown(asdu, self);
             messageHandled = true;
@@ -3058,6 +3064,7 @@ handleMessage(MasterConnection self, uint8_t* buffer, int msgSize)
             {
                 DEBUG_PRINT(
                     "CS104 SLAVE: Unconfirmed messages after STOPDT_ACT -> pending unconfirmed stopped state\n");
+                self->state = M_CON_STATE_UNCONFIRMED_STOPPED;
             }
             else
             {
@@ -3066,18 +3073,8 @@ handleMessage(MasterConnection self, uint8_t* buffer, int msgSize)
                 self->state = M_CON_STATE_STOPPED;
 
                 if (writeToSocket(self, STOPDT_CON_MSG, STOPDT_CON_MSG_SIZE) < 0)
-                {
-#if (CONFIG_USE_SEMAPHORES == 1)
-                    Semaphore_post(self->stateLock);
-#endif
-
                     return false;
-                }
             }
-
-#if (CONFIG_USE_SEMAPHORES == 1)
-            Semaphore_post(self->stateLock);
-#endif
         }
 
         /* Check for TESTFR_CON message */

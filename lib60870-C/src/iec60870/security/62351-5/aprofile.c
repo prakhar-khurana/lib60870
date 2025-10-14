@@ -20,6 +20,7 @@
 #define MBEDTLS_ALLOW_PRIVATE_ACCESS
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecp.h>
+#include <mbedtls/bignum.h>
 #include "aprofile_internal.h"
 #include "cs104_frame.h"
 #include "lib_memory.h"
@@ -49,6 +50,12 @@ AProfile_create(void* connection, AProfile_SendAsduCallback sendAsduCallback)
 
     mbedtls_gcm_init(&self->gcm_encrypt);
     mbedtls_ecdh_init(&self->ecdh);
+    
+    /* For mbedtls 2.x with new context, set point format */
+    #if !defined(MBEDTLS_ECDH_LEGACY_CONTEXT)
+    self->ecdh.point_format = MBEDTLS_ECP_PF_UNCOMPRESSED;
+    #endif
+    
     mbedtls_ctr_drbg_init(&self->ctr_drbg);
     mbedtls_entropy_init(&self->entropy);
     mbedtls_gcm_init(&self->gcm_decrypt);
@@ -115,29 +122,19 @@ AProfile_onStartDT(AProfileContext self)
 
     printf("APROFILE: StartDT received, initiating key exchange\n");
     
-    // /*****************************************************************
-    //  * #FIX: Use direct struct access for mbedtls v2.x compatibility. *
-    //  *****************************************************************/
-    ret = mbedtls_ecp_group_load(&self->ecdh.ctx.mbed_ecdh.grp, MBEDTLS_ECP_DP_SECP256R1);
+    /* Use high-level mbedtls 2.x ECDH API */
+    ret = mbedtls_ecdh_setup(&self->ecdh, MBEDTLS_ECP_DP_SECP256R1);
     if (ret != 0) {
-        printf("APROFILE: Failed to setup ECP group\n");
-        mbedtls_ecdh_free(&self->ecdh);
+        printf("APROFILE: Failed to setup ECDH context (error: -0x%04x)\n", -ret);
         return false;
     }
 
+    /* Generate our key pair and export public key */
     size_t olen = 0;
-    // ret = mbedtls_ecdh_gen_public(&self->ecdh.grp, &self->ecdh.d, &self->ecdh.Q, mbedtls_ctr_drbg_random, &self->ctr_drbg);
-    ret = mbedtls_ecdh_make_public(&self->ecdh, &olen, self->localPublicKey, sizeof(self->localPublicKey), mbedtls_ctr_drbg_random, &self->ctr_drbg);
+    ret = mbedtls_ecdh_make_public(&self->ecdh, &olen, self->localPublicKey, sizeof(self->localPublicKey),
+                                    mbedtls_ctr_drbg_random, &self->ctr_drbg);
     if (ret != 0) {
-        printf("APROFILE: Failed to generate public key\n");
-        mbedtls_ecdh_free(&self->ecdh);
-        return false;
-    }
-
-    // ret = mbedtls_ecp_point_write_binary(&self->ecdh.grp, &self->ecdh.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &olen, self->localPublicKey, sizeof(self->localPublicKey));
-    if (ret != 0) {
-        printf("APROFILE: Failed to write public key\n");
-        mbedtls_ecdh_free(&self->ecdh);
+        printf("APROFILE: Failed to generate public key (error: -0x%04x)\n", -ret);
         return false;
     }
 
@@ -254,19 +251,20 @@ AProfile_handleInPdu(AProfileContext self, const uint8_t* in, int inSize, const 
                     const uint8_t* peer_key = SecurityPublicKey_getKeyValue(spk);
                     int peer_key_len = SecurityPublicKey_getKeyLength(spk);
 
-                    // Use MBEDTLS_PRIVATE for lvalue access
+                    /* Read peer's public key and compute shared secret using high-level API */
                     ret = mbedtls_ecdh_read_public(&self->ecdh, peer_key, peer_key_len);
                     if (ret != 0) {
-                        printf("APROFILE: Failed to read peer public key\n");
-                        mbedtls_ecdh_free(&self->ecdh);
+                        printf("APROFILE: Failed to read peer public key (error: -0x%04x)\n", -ret);
                         break;
                     }
+                    
+                    /* Compute shared secret */
                     uint8_t shared_secret[32];
-                    size_t shared_secret_len;
-                    ret = mbedtls_ecdh_calc_secret(&self->ecdh, &shared_secret_len, shared_secret, sizeof(shared_secret), mbedtls_ctr_drbg_random, &self->ctr_drbg);
+                    size_t shared_secret_len = sizeof(shared_secret);
+                    ret = mbedtls_ecdh_calc_secret(&self->ecdh, &shared_secret_len, shared_secret, sizeof(shared_secret),
+                                                    mbedtls_ctr_drbg_random, &self->ctr_drbg);
                     if (ret != 0) {
-                        printf("APROFILE: Failed to calculate shared secret\n");
-                        mbedtls_ecdh_free(&self->ecdh);
+                        printf("APROFILE: Failed to calculate shared secret (error: -0x%04x)\n", -ret);
                         break;
                     }
 
@@ -276,8 +274,7 @@ AProfile_handleInPdu(AProfileContext self, const uint8_t* in, int inSize, const 
                                       (const unsigned char*)"IEC62351-5", 11,
                                       session_key, sizeof(session_key));
                     if (ret != 0) {
-                        printf("APROFILE: Failed to derive session key\n");
-                        mbedtls_ecdh_free(&self->ecdh);
+                        printf("APROFILE: Failed to derive session key (error: -0x%04x)\n", -ret);
                         break;
                     }
 

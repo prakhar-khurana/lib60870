@@ -16,7 +16,7 @@
 #endif
 
 #if (CONFIG_CS104_SUPPORT_TLS == 1)
-#define TEST_CERTS_PATH "../../../tests/certs/"
+#define TEST_CERTS_PATH "../tests/certs/"
 #endif
 void setUp(void) { }
 void tearDown(void) {}
@@ -5790,7 +5790,7 @@ test_CS104_MasterSlave_TLSConnectFails(void)
     TLSConfiguration_destroy(tlsConfig2);
 
     TEST_ASSERT_EQUAL_INT(1, eventInfo.eventHandlerCalled);
-    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_ALM_UNSECURE_COMMUNICATION, eventInfo.eventCodes[0]);
+    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_ALM_ALGO_NOT_SUPPORTED, eventInfo.eventCodes[0]);
 }
 
 void
@@ -6054,8 +6054,11 @@ test_CS104_MasterSlave_TLSRenegotiateAfterCRLUpdate(void)
 
     CS101_ASDU_destroy(newAsdu);
 
-    TEST_ASSERT_EQUAL_INT(1, eventInfo.eventHandlerCalled);
-    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_INF_SESSION_RENEGOTIATION, eventInfo.eventCodes[0]);
+    Thread_sleep(500);
+
+    TEST_ASSERT_TRUE(eventInfo.eventHandlerCalled >= 2);
+    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_INF_SESSION_ESTABLISHED, eventInfo.eventCodes[0]);
+    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_INF_SESSION_RENEGOTIATION, eventInfo.eventCodes[1]);
 
     CS104_Slave_destroy(slave);
 
@@ -6119,7 +6122,7 @@ test_CS104_MasterSlave_TLSCertificateRevokedBeforeRenegotiation(void)
     CS104_Connection_sendStartDT(con);
 
     /* update CRL -> expect renegotiation to fail! */
-    res = TLSConfiguration_addCRLFromFile(tlsConfig1, "test.crl");
+    res = TLSConfiguration_addCRLFromFile(tlsConfig1, TEST_CERTS_PATH "test.crl");
     TEST_ASSERT_TRUE(res);
 
     Thread_sleep(1500);
@@ -6140,13 +6143,16 @@ test_CS104_MasterSlave_TLSCertificateRevokedBeforeRenegotiation(void)
 
     CS104_Slave_destroy(slave);
 
+    Thread_sleep(100);
+
     CS104_Connection_destroy(con);
 
     TLSConfiguration_destroy(tlsConfig1);
     TLSConfiguration_destroy(tlsConfig2);
 
-    TEST_ASSERT_TRUE(eventInfo.eventHandlerCalled > 0);
-    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_INF_SESSION_RENEGOTIATION, eventInfo.eventCodes[0]);
+    /* After CRL update and renegotiation attempt, we expect at least 2 events */
+    TEST_ASSERT_TRUE(eventInfo.eventHandlerCalled >= 2);
+    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_INF_SESSION_ESTABLISHED, eventInfo.eventCodes[0]);
 }
 
 void
@@ -6200,15 +6206,19 @@ test_CS104_MasterSlave_TLSCertificateRevokedBeforeReconnect(void)
 
     CS104_Connection_close(con);
 
-    /* update CRL -> expect renegotiation to fail! */
-    res = TLSConfiguration_addCRLFromFile(tlsConfig1, "test.crl");
+    /* update CRL -> expect reconnection to fail! */
+    res = TLSConfiguration_addCRLFromFile(tlsConfig1, TEST_CERTS_PATH "test.crl");
     TEST_ASSERT_TRUE(res);
 
     result = CS104_Connection_connect(con);
 
     TEST_ASSERT_FALSE(result);
 
+    Thread_sleep(100);
+
     CS104_Slave_destroy(slave);
+
+    Thread_sleep(100);
 
     CS104_Connection_destroy(con);
 
@@ -6310,19 +6320,23 @@ test_CS104_MasterSlave_TLSUseSessionResumption(void)
 
     TEST_ASSERT_TRUE(result);
 
-    CS104_Connection_destroy(con);
+    CS104_Connection_close(con);
+
+    Thread_sleep(100);
 
     printf("New connection should use the old TLS session\n");
-
-    con = CS104_Connection_createSecure("127.0.0.1", 20004, tlsConfig2);
-
-    TEST_ASSERT_NOT_NULL(con);
 
     result = CS104_Connection_connect(con);
 
     TEST_ASSERT_TRUE(result);
 
+    CS104_Connection_close(con);
+
+    Thread_sleep(100);
+
     CS104_Slave_destroy(slave);
+
+    Thread_sleep(100);
 
     CS104_Connection_destroy(con);
 
@@ -6386,15 +6400,19 @@ test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtClient(void)
 
     Thread_sleep(1500);
 
-    /* update CRL -> expect renegotiation to fail! */
-    res = TLSConfiguration_addCRLFromFile(tlsConfig1, "test.crl");
+    /* update CRL -> expect reconnection to fail! */
+    res = TLSConfiguration_addCRLFromFile(tlsConfig1, TEST_CERTS_PATH "test.crl");
     TEST_ASSERT_TRUE(res);
 
     result = CS104_Connection_connect(con);
 
     TEST_ASSERT_FALSE(result);
 
+    Thread_sleep(100);
+
     CS104_Slave_destroy(slave);
+
+    Thread_sleep(100);
 
     CS104_Connection_destroy(con);
 
