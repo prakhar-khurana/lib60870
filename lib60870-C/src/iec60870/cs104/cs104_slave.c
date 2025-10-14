@@ -2213,11 +2213,15 @@ handleASDU(MasterConnection self, CS101_ASDU asdu)
                         if (slave->interrogationHandler(slave->interrogationHandlerParameter,
                                                         &(self->iMasterConnection), asdu,
                                                         InterrogationCommand_getQOI(irc)))
+                        {
                             messageHandled = true;
+                        }
                     }
                 }
-                else
-                    return false;
+            }
+            else
+            {
+                messageHandled = true;
             }
         }
         else
@@ -2255,11 +2259,15 @@ handleASDU(MasterConnection self, CS101_ASDU asdu)
                         if (slave->counterInterrogationHandler(slave->counterInterrogationHandlerParameter,
                                                                &(self->iMasterConnection), asdu,
                                                                CounterInterrogationCommand_getQCC(cic)))
+                        {
                             messageHandled = true;
+                        }
                     }
                 }
-                else
-                    return false;
+            }
+            else
+            {
+                messageHandled = true;
             }
         }
         else
@@ -2294,11 +2302,14 @@ handleASDU(MasterConnection self, CS101_ASDU asdu)
                 if (rc)
                 {
                     if (slave->readHandler(slave->readHandlerParameter, &(self->iMasterConnection), asdu,
-                                           InformationObject_getObjectAddress((InformationObject)rc)))
+                                           InformationObject_getObjectAddress((InformationObject)rc))) {
                         messageHandled = true;
+                    }
                 }
-                else
-                    return false;
+            }
+            else
+            {
+                messageHandled = true;
             }
         }
         else
@@ -2359,7 +2370,9 @@ handleASDU(MasterConnection self, CS101_ASDU asdu)
                     messageHandled = true;
                 }
                 else
-                    return false;
+                {
+                    messageHandled = true;
+                }
             }
         }
         else
@@ -2456,14 +2469,14 @@ handleASDU(MasterConnection self, CS101_ASDU asdu)
                     {
                         if (slave->resetProcessHandler(slave->resetProcessHandlerParameter, &(self->iMasterConnection),
                                                        asdu, ResetProcessCommand_getQRP(rpc)))
+                        {
                             messageHandled = true;
+                        }
                     }
                 }
-                else
-                    return false;
             }
         }
-        else
+        else if (slave->resetProcessHandler == NULL)
         {
             responseCOTUnknown(asdu, self);
             messageHandled = true;
@@ -2508,14 +2521,14 @@ handleASDU(MasterConnection self, CS101_ASDU asdu)
                         if (slave->delayAcquisitionHandler(slave->delayAcquisitionHandlerParameter,
                                                            &(self->iMasterConnection), asdu,
                                                            DelayAcquisitionCommand_getDelay(dac)))
+                        {
                             messageHandled = true;
+                        }
                     }
                 }
-                else
-                    return false;
             }
         }
-        else
+        else if (slave->delayAcquisitionHandler == NULL)
         {
             responseCOTUnknown(asdu, self);
             messageHandled = true;

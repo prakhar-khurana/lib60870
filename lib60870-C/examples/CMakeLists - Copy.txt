@@ -63,11 +63,7 @@ endif()
 if(WITH_MBEDTLS)
     foreach(example_target ${EXAMPLE_TARGETS})
         if (TARGET ${example_target})
-            # Link mbedtls explicitly to ensure symbols are resolved
             target_link_libraries(${example_target} PRIVATE mbedtls_static)
-            target_include_directories(${example_target} PRIVATE 
-                "${CMAKE_SOURCE_DIR}/lib60870-C/dependencies/mbedtls-2.28.8/include"
-            )
         endif()
     endforeach()
 endif()

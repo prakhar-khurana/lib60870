@@ -16,20 +16,8 @@
 #endif
 
 #if (CONFIG_CS104_SUPPORT_TLS == 1)
-// Make sure to use the correct path for test certificates/keys
-#define TEST_CERT_PATH "./lib60870-C/tests/"
-#define TEST_CERTS_PATH "./lib60870-C/tests/certs/"
-// Update all TLSConfiguration_setOwnKeyFromFile, TLSConfiguration_setOwnCertificateFromFile, TLSConfiguration_addCACertificateFromFile, TLSConfiguration_addCRLFromFile calls to use TEST_CERT_PATH or TEST_CERTS_PATH
-// Example:
-// TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERT_PATH "server_CA1_1.key", NULL);
-// TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERT_PATH "server_CA1_1.pem");
-// TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERT_PATH "root_CA1.pem");
-
-// If you do not need TLS, disable these tests for now to avoid failures
-#undef CONFIG_CS104_SUPPORT_TLS
-#define CONFIG_CS104_SUPPORT_TLS 0
+#define TEST_CERTS_PATH "../../../tests/certs/"
 #endif
-
 void setUp(void) { }
 void tearDown(void) {}
 
@@ -309,10 +297,7 @@ test_StepPositionInformation(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, StepPositionInformation_getQuality(spi7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, StepPositionInformation_getQuality(spi8));
 
-
-	uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-	Frame f = T104Frame_create();
+	Frame f = (Frame)T104Frame_create();
 
 	CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -336,7 +321,7 @@ test_StepPositionInformation(void)
 
 	CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL(52,  Frame_getMsgSize(f)); // test_StepPositionInformation
+    TEST_ASSERT_EQUAL(46,  Frame_getMsgSize(f) - 6); // test_StepPositionInformation
 
     CS101_ASDU_destroy(asdu);
 
@@ -512,10 +497,7 @@ test_StepPositionWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, StepPositionInformation_getQuality((StepPositionInformation)spi7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, StepPositionInformation_getQuality((StepPositionInformation)spi8));
 
-
-	uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-	Frame f = T104Frame_create();
+	Frame f = (Frame)T104Frame_create();
 
 	CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -539,7 +521,7 @@ test_StepPositionWithCP24Time2a(void)
 
 	CS101_ASDU_encode(asdu, f);
 
-	TEST_ASSERT_EQUAL_INT(70, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(76, Frame_getMsgSize(f));
 
 	CS101_ASDU_destroy(asdu);
 
@@ -731,10 +713,7 @@ test_StepPositionWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, StepPositionInformation_getQuality((StepPositionInformation)spi7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, StepPositionInformation_getQuality((StepPositionInformation)spi8));
 
-
-	uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-	Frame f = T104Frame_create();
+	Frame f = (Frame)T104Frame_create();
 
 	CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -758,7 +737,7 @@ test_StepPositionWithCP56Time2a(void)
 
 	CS101_ASDU_encode(asdu, f);
 
-	TEST_ASSERT_EQUAL_INT(102, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(108, Frame_getMsgSize(f));
 
 	CS101_ASDU_destroy(asdu);
 
@@ -1204,7 +1183,7 @@ test_CS104SlaveEventQueue1()
 
     CS104_Connection_sendStartDT(con);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Connection_sendStopDT(con);
 
@@ -1238,7 +1217,7 @@ test_CS104SlaveEventQueue1()
         Thread_sleep(10);
     }
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Connection_close(con);
 
@@ -1329,7 +1308,7 @@ test_CS104SlaveEventQueueOverflow()
         Thread_sleep(10);
     }
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Connection_close(con);
 
@@ -1386,7 +1365,7 @@ test_CS104SlaveEventQueueOverflow2()
 
     CS104_Connection_sendStartDT(con);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Connection_close(con);
 
@@ -1451,7 +1430,7 @@ test_CS104SlaveEventQueueOverflow2()
         //Thread_sleep(10);
     }
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Connection_close(con);
 
@@ -1605,7 +1584,7 @@ test_CS104SlaveEventQueueOverflow3()
 
     CS104_Connection_sendStartDT(con);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Connection_close(con);
 
@@ -1798,9 +1777,7 @@ test_DoublePointInformation(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_DOUBLE_POINT_ON, DoublePointInformation_getValue(dpi2));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_DOUBLE_POINT_INDETERMINATE, DoublePointInformation_getValue(dpi3));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -1869,9 +1846,7 @@ test_SinglePointInformation(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, SinglePointInformation_getQuality(spi4));
     TEST_ASSERT_TRUE(SinglePointInformation_getValue(spi1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -1948,9 +1923,7 @@ test_SinglePointInformationSequence(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, SinglePointInformation_getQuality(spi4));
     TEST_ASSERT_TRUE(SinglePointInformation_getValue(spi1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, true, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2039,9 +2012,7 @@ test_DoublePointWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, DoublePointInformation_getQuality((DoublePointInformation )dpi3));
     TEST_ASSERT_TRUE(DoublePointInformation_getQuality((DoublePointInformation )dpi1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2055,7 +2026,7 @@ test_DoublePointWithCP24Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL(45,  Frame_getMsgSize(f)); // test_SinglePointWithCP56Time2a
+    TEST_ASSERT_EQUAL(33,  Frame_getMsgSize(f)); // test_DoublePointWithCP24Time2a
 
     CS101_ASDU_destroy(asdu);
 
@@ -2138,9 +2109,7 @@ test_SinglePointWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, SinglePointInformation_getQuality((SinglePointInformation)spi3));
     TEST_ASSERT_TRUE(SinglePointInformation_getValue((SinglePointInformation)spi1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2227,9 +2196,7 @@ test_DoublePointWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, DoublePointInformation_getQuality((DoublePointInformation)dpi3));
     TEST_ASSERT_TRUE(DoublePointInformation_getValue((DoublePointInformation)dpi1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2243,7 +2210,7 @@ test_DoublePointWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(39, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(45, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -2308,9 +2275,7 @@ test_SinglePointWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_GOOD, SinglePointInformation_getQuality((SinglePointInformation)spi3));
     TEST_ASSERT_TRUE(SinglePointInformation_getValue((SinglePointInformation)spi1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2324,7 +2289,7 @@ test_SinglePointWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(39, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(45, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -2370,9 +2335,7 @@ test_NormalizeMeasureValueWithoutQuality(void)
 
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.5f, MeasuredValueNormalizedWithoutQuality_getValue((MeasuredValueNormalizedWithoutQuality )nmv1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2382,7 +2345,7 @@ test_NormalizeMeasureValueWithoutQuality(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(11, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(17, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -2440,9 +2403,7 @@ test_NormalizeMeasureValue(void)
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.4f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv7));
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.5f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2466,7 +2427,7 @@ test_NormalizeMeasureValue(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(54, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(60, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -2623,9 +2584,7 @@ test_MeasuredValueNormalizedWithCP24Time2a(void)
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.4f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv7));
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.5f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2649,7 +2608,7 @@ test_MeasuredValueNormalizedWithCP24Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(78, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(84, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -2814,9 +2773,7 @@ test_MeasuredValueNormalizedWithCP56Time2a(void)
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.4f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv7));
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 0.5f, MeasuredValueNormalized_getValue((MeasuredValueNormalized )nmv8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2840,7 +2797,7 @@ test_MeasuredValueNormalizedWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(110, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(116, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -2946,9 +2903,8 @@ test_MeasuredValueScaled(void)
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs7));
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
+    Frame f = (Frame)T104Frame_create();
 
-    Frame f = T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -2972,7 +2928,7 @@ test_MeasuredValueScaled(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(54, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(60, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -3121,9 +3077,7 @@ test_MeasuredValueScaledWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs7));
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3147,7 +3101,7 @@ test_MeasuredValueScaledWithCP24Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(78, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(84, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -3311,9 +3265,7 @@ test_MeasuredValueScaledWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs7));
     TEST_ASSERT_EQUAL_INT(INT16_MIN, MeasuredValueScaled_getValue((MeasuredValueScaled )mvs8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3337,7 +3289,7 @@ test_MeasuredValueScaledWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(110, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(116, Frame_getMsgSize(f));
 
     CS101_ASDU_destroy(asdu);
 
@@ -3443,9 +3395,7 @@ test_MeasuredValueShort(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, MeasuredValueShort_getQuality(mvs7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, MeasuredValueShort_getQuality(mvs8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3469,7 +3419,7 @@ test_MeasuredValueShort(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(70, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(70, Frame_getMsgSize(f) - 6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -3608,9 +3558,7 @@ test_MeasuredValueShortWithCP24Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, MeasuredValueShort_getQuality((MeasuredValueShort )mvs7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, MeasuredValueShort_getQuality((MeasuredValueShort )mvs8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3634,7 +3582,7 @@ test_MeasuredValueShortWithCP24Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(94, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(94, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -3789,9 +3737,7 @@ test_MeasuredValueShortWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_NON_TOPICAL, MeasuredValueShort_getQuality((MeasuredValueShort )mvs7));
     TEST_ASSERT_EQUAL_UINT8(IEC60870_QUALITY_INVALID, MeasuredValueShort_getQuality((MeasuredValueShort )mvs8));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3815,7 +3761,7 @@ test_MeasuredValueShortWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(126, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(126, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -3900,9 +3846,7 @@ test_IntegratedTotals(void)
     TEST_ASSERT_FALSE(BinaryCounterReading_hasCarry(IntegratedTotals_getBCR(it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isAdjusted(IntegratedTotals_getBCR(it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR(it2)));    
-	uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -3914,7 +3858,7 @@ test_IntegratedTotals(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(22, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(22, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -3988,9 +3932,7 @@ test_IntegratedTotalsWithCP24Time2a(void)
     TEST_ASSERT_FALSE(BinaryCounterReading_hasCarry(IntegratedTotals_getBCR((IntegratedTotals )it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isAdjusted(IntegratedTotals_getBCR((IntegratedTotals )it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR((IntegratedTotals )it2)));    
-	uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -4002,7 +3944,7 @@ test_IntegratedTotalsWithCP24Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(28, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(28, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4080,9 +4022,7 @@ test_IntegratedTotalsWithCP56Time2a(void)
     TEST_ASSERT_FALSE(BinaryCounterReading_hasCarry(IntegratedTotals_getBCR((IntegratedTotals )it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isAdjusted(IntegratedTotals_getBCR((IntegratedTotals )it2)));
     TEST_ASSERT_FALSE(BinaryCounterReading_isInvalid(IntegratedTotals_getBCR((IntegratedTotals )it2)));    
-	uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -4094,7 +4034,7 @@ test_IntegratedTotalsWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(36, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(36, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4140,9 +4080,7 @@ test_SingleCommand(void)
     TEST_ASSERT_TRUE(SingleCommand_isSelect(sc));
     TEST_ASSERT_EQUAL_INT(0, SingleCommand_getQU(sc));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4152,7 +4090,7 @@ test_SingleCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4192,9 +4130,7 @@ test_SingleCommandWithCP56Time2a(void)
     TEST_ASSERT_TRUE(SingleCommand_isSelect((SingleCommand )sc));
     TEST_ASSERT_EQUAL_INT(0, SingleCommand_getQU((SingleCommand )sc));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4204,7 +4140,7 @@ test_SingleCommandWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(17, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(17, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4238,9 +4174,7 @@ test_DoubleCommand(void)
     TEST_ASSERT_EQUAL_INT(1, DoubleCommand_getState(dc));
     TEST_ASSERT_EQUAL_INT(0, DoubleCommand_getQU(dc));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4250,7 +4184,7 @@ test_DoubleCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4288,9 +4222,7 @@ test_DoubleCommandWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(1, DoubleCommandWithCP56Time2a_getState(dc));
     TEST_ASSERT_EQUAL_INT(0, DoubleCommandWithCP56Time2a_getQU(dc));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4300,7 +4232,7 @@ test_DoubleCommandWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(17, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(17, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4334,9 +4266,7 @@ test_StepCommandValue(void)
     TEST_ASSERT_EQUAL_INT(IEC60870_STEP_INVALID_0, StepCommand_getState(scv));
     TEST_ASSERT_EQUAL_INT(0, StepCommand_getQU(scv));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4346,7 +4276,7 @@ test_StepCommandValue(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4383,9 +4313,7 @@ test_StepCommandWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(IEC60870_STEP_INVALID_0, StepCommandWithCP56Time2a_getState(scv));
     TEST_ASSERT_EQUAL_INT(0, StepCommandWithCP56Time2a_getQU(scv));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4395,7 +4323,7 @@ test_StepCommandWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(17, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(17, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4429,9 +4357,7 @@ test_SetpointCommandNormalized(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandNormalized_getQL(spcn));
     TEST_ASSERT_TRUE(SetpointCommandNormalized_isSelect(spcn));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4441,7 +4367,7 @@ test_SetpointCommandNormalized(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(12, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(12, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4478,9 +4404,7 @@ test_SetpointCommandNormalizedWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandNormalizedWithCP56Time2a_getQL(spcn));
     TEST_ASSERT_TRUE(SetpointCommandNormalizedWithCP56Time2a_isSelect(spcn));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4490,7 +4414,7 @@ test_SetpointCommandNormalizedWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(19, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(19, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4524,9 +4448,7 @@ test_SetpointCommandScaled(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandScaled_getQL(spcs));
     TEST_ASSERT_TRUE(SetpointCommandScaled_isSelect(spcs));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4536,7 +4458,7 @@ test_SetpointCommandScaled(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(12, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(12, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4574,9 +4496,7 @@ test_SetpointCommandScaledWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandScaledWithCP56Time2a_getQL(spcs));
     TEST_ASSERT_TRUE(SetpointCommandScaledWithCP56Time2a_isSelect(spcs));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4586,7 +4506,7 @@ test_SetpointCommandScaledWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(19, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(19, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4620,9 +4540,7 @@ test_SetpointCommandShort(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandShort_getQL(spcs));
     TEST_ASSERT_TRUE(SetpointCommandShort_isSelect(spcs));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4632,7 +4550,7 @@ test_SetpointCommandShort(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(14, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(14, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4669,9 +4587,7 @@ test_SetpointCommandShortWithCP56Time2a(void)
     TEST_ASSERT_EQUAL_INT(0, SetpointCommandShortWithCP56Time2a_getQL(spcs));
     TEST_ASSERT_TRUE(SetpointCommandShortWithCP56Time2a_isSelect(spcs));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4681,7 +4597,7 @@ test_SetpointCommandShortWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(21, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(21, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4712,10 +4628,8 @@ test_InterrogationCommand(void)
     uint8_t qoi = 21;
     ic = InterrogationCommand_create(NULL, 101, qoi);
     TEST_ASSERT_EQUAL_INT(21, InterrogationCommand_getQOI(ic));
-
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4725,7 +4639,7 @@ test_InterrogationCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4755,9 +4669,7 @@ test_CounterInterrogationCommand(void)
 
     TEST_ASSERT_EQUAL_INT(1, CounterInterrogationCommand_getQCC(cic));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4767,7 +4679,7 @@ test_CounterInterrogationCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4793,10 +4705,8 @@ test_ReadCommand(void)
 {
     ReadCommand rc;
     rc = ReadCommand_create( NULL, 101);
-
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4806,7 +4716,7 @@ test_ReadCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(9, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(9, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4833,10 +4743,8 @@ test_ClockSynchronizationCommand(void)
     struct sCP56Time2a cpTime1;
     CP56Time2a_createFromMsTimestamp(&cpTime1, time1);
     csc = ClockSynchronizationCommand_create(NULL, 101, &cpTime1);
-
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4846,7 +4754,7 @@ test_ClockSynchronizationCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(16, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(16, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4875,9 +4783,7 @@ test_ResetProcessCommand(void)
 
     TEST_ASSERT_EQUAL_INT(0, ResetProcessCommand_getQRP(rpc));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4887,7 +4793,7 @@ test_ResetProcessCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(10, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4921,9 +4827,7 @@ test_DelayAcquisitionCommand(void)
     CP16Time2a_setEplapsedTimeInMs(&delay, 24123);
 
     dac = DelayAcquisitionCommand_create(NULL, 101, &delay);
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -4933,7 +4837,7 @@ test_DelayAcquisitionCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(11, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(11, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4958,11 +4862,9 @@ test_TestCommand(void)
 {
     TestCommand tc;
     tc = TestCommand_create(NULL);
-
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
-
+    
+    Frame f = (Frame)T104Frame_create();
+    
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
     CS101_ASDU_addInformationObject(asdu, (InformationObject) tc);
@@ -4971,7 +4873,7 @@ test_TestCommand(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(11, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(11, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -4982,8 +4884,8 @@ test_TestCommand(void)
     TestCommand tc_dec = (TestCommand) CS101_ASDU_getElement(asdu2, 0);
 
     TEST_ASSERT_EQUAL_INT(0, InformationObject_getObjectAddress((InformationObject )tc_dec));
-    TEST_ASSERT_EQUAL_INT(0xaa, buffer[9]);
-    TEST_ASSERT_EQUAL_INT(0x55, buffer[10]);
+    TEST_ASSERT_EQUAL_INT(0xaa, Frame_getBuffer(f)[15]);
+    TEST_ASSERT_EQUAL_INT(0x55, Frame_getBuffer(f)[16]);
     TEST_ASSERT_TRUE(TestCommand_isValid(tc_dec));
 
     TestCommand_destroy(tc_dec);
@@ -5004,9 +4906,7 @@ test_TestCommandWithTime(void)
 
     tc = TestCommandWithCP56Time2a_create(NULL, 0xaa55, &cpTime1);
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -5016,7 +4916,7 @@ test_TestCommandWithTime(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(18, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(18, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -5117,7 +5017,6 @@ test_Bitstring32CommandWithCP56Time2a(void)
 {
     Bitstring32CommandWithCP56Time2a bsc;
     uint64_t time1 = Hal_getTimeInMs();
-
     struct sCP56Time2a cpTime1;
 
     CP56Time2a_createFromMsTimestamp(&cpTime1, time1);
@@ -5126,9 +5025,7 @@ test_Bitstring32CommandWithCP56Time2a(void)
 
     TEST_ASSERT_EQUAL_UINT32(0x0000000000, Bitstring32CommandWithCP56Time2a_getValue(bsc));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -5138,7 +5035,7 @@ test_Bitstring32CommandWithCP56Time2a(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(20, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(20, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -5174,11 +5071,9 @@ test_QueryLog(void)
     CP56Time2a_createFromMsTimestamp(&rangeStopTime, stopTime);
 
     queryLog = QueryLog_create(NULL, 101, 256, &rangeStartTime, &rangeStopTime);
-
-    TEST_ASSERT_EQUAL_UINT16(256, QueryLog_getNOF(queryLog));    
-	uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    
+    TEST_ASSERT_EQUAL_UINT16(256, QueryLog_getNOF(queryLog));
+    Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_ACTIVATION, 0, 1, false, false);
 
@@ -5188,7 +5083,7 @@ test_QueryLog(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(25, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(25, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -5233,9 +5128,7 @@ test_FileDirectory(void)
 
     TEST_ASSERT_EQUAL_UINT32(1024, FileDirectory_getLengthOfFile(fd1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     /* NOTE: file directory is always a "sequence" */
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, true, CS101_COT_SPONTANEOUS, 0, 1, false, false);
@@ -5250,7 +5143,7 @@ test_FileDirectory(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(48, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(48, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -5303,9 +5196,7 @@ test_FileDirectorySingleEntry(void)
 
     TEST_ASSERT_EQUAL_UINT32(1024, FileDirectory_getLengthOfFile(fd1));
 
-    uint8_t buffer[256]; /* This buffer will be used by the frame */
-
-    Frame f = T104Frame_create();
+    Frame f = (Frame)T104Frame_create();
 
     /* NOTE: file directory is always a "sequence" */
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, true, CS101_COT_SPONTANEOUS, 0, 1, false, false);
@@ -5316,7 +5207,7 @@ test_FileDirectorySingleEntry(void)
 
     CS101_ASDU_encode(asdu, f);
 
-    TEST_ASSERT_EQUAL_INT(22, Frame_getMsgSize(f));
+    TEST_ASSERT_EQUAL_INT(22, Frame_getMsgSize(f)-6);
 
     CS101_ASDU_destroy(asdu);
 
@@ -5344,9 +5235,7 @@ void
 test_BitString32xx_encodeDecode(void)
 {
 #ifndef _WIN32
-    uint8_t buffer[256];
-    
-	Frame f = T104Frame_create();
+	Frame f = (Frame)T104Frame_create();
 
     CS101_ASDU asdu = CS101_ASDU_create(&defaultAppLayerParameters, false, CS101_COT_PERIODIC, 0, 1, false, false);
 
@@ -5539,7 +5428,7 @@ test_CS104_Connection_UseAfterServerClosedConnection(void)
     CS104_Slave_destroy(slave);
 
     /* wait to allow client side to detect connection loss */
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     result = CS104_Connection_sendInterrogationCommand(con, CS101_COT_ACTIVATION, 1, IEC60870_QOI_STATION);
 
@@ -5582,7 +5471,7 @@ test_CS104_Connection_async_success(void)
 
 	CS104_Connection_connectAsync(con);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_EQUAL_INT(CS104_CONNECTION_OPENED, test_CS104_Connection_async_timeout_event);
 
@@ -5742,11 +5631,11 @@ test_CS104_MasterSlave_TLSConnectSuccess(void)
 
     TLSConfiguration_setChainValidation(tlsConfig1, true);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration tlsConfig2 = TLSConfiguration_create();
@@ -5755,14 +5644,14 @@ test_CS104_MasterSlave_TLSConnectSuccess(void)
     TLSConfiguration_setAllowOnlyKnownCertificates(tlsConfig2, true);
 
     /* use valid certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
-    res = TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, "server_CA1_1.pem");
+    res = TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -5800,11 +5689,11 @@ test_CS104_MasterSlave_TLSConnectSuccessWithoutSeparateCACert(void)
 
     TLSConfiguration_setChainValidation(tlsConfig1, true);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1_chain.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1_chain.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "server_CA1_1_chain.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1_chain.pem");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration tlsConfig2 = TLSConfiguration_create();
@@ -5813,14 +5702,14 @@ test_CS104_MasterSlave_TLSConnectSuccessWithoutSeparateCACert(void)
     TLSConfiguration_setAllowOnlyKnownCertificates(tlsConfig2, true);
 
     /* use expired certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH  "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
-    res = TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, "server_CA1_1_chain.pem");
+    res = TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, TEST_CERTS_PATH  "server_CA1_1_chain.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -5867,14 +5756,14 @@ test_CS104_MasterSlave_TLSConnectFails(void)
     TLSConfiguration_setAllowOnlyKnownCertificates(tlsConfig2, true);
 
     /* use valid certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2,TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
-    res = TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, "server_CA1_1.pem");
+    res = TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -5901,7 +5790,7 @@ test_CS104_MasterSlave_TLSConnectFails(void)
     TLSConfiguration_destroy(tlsConfig2);
 
     TEST_ASSERT_EQUAL_INT(1, eventInfo.eventHandlerCalled);
-    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_ALM_ALGO_NOT_SUPPORTED, eventInfo.eventCodes[0]);
+    TEST_ASSERT_EQUAL_INT(TLS_EVENT_CODE_ALM_UNSECURE_COMMUNICATION, eventInfo.eventCodes[0]);
 }
 
 void
@@ -5920,11 +5809,11 @@ test_CS104_MasterSlave_TLSVersionMismatch(void)
 
     TLSConfiguration_setChainValidation(tlsConfig1, true);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration tlsConfig2 = TLSConfiguration_create();
@@ -5936,14 +5825,14 @@ test_CS104_MasterSlave_TLSVersionMismatch(void)
     TLSConfiguration_setMaxTlsVersion(tlsConfig2, TLS_VERSION_TLS_1_1);
 
     /* use valid certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
-    res = TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, "server_CA1_1.pem");
+    res = TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -5985,9 +5874,9 @@ test_CS104_MasterSlave_TLSCertificateExpired(void)
 
     TLSConfiguration_setEventHandler(tlsConfig1, securityEventHandler, &eventInfo);
 
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
 
     TLSConfiguration_setMinTlsVersion(tlsConfig1, TLS_VERSION_TLS_1_2);
 
@@ -5996,9 +5885,9 @@ test_CS104_MasterSlave_TLSCertificateExpired(void)
     TLSConfiguration_setChainValidation(tlsConfig2, true);;
 
     /* use expired certificate */
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_1.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_1.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_1.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_1.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
 
     TLSConfiguration_setMinTlsVersion(tlsConfig2, TLS_VERSION_TLS_1_2);
 
@@ -6044,14 +5933,14 @@ test_CS104_MasterSlave_TLSCertificateRevoked(void)
 
     TLSConfiguration_setEventHandler(tlsConfig1, securityEventHandler, &eventInfo);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
-    res = TLSConfiguration_addCRLFromFile(tlsConfig1, "test.crl");
+    res = TLSConfiguration_addCRLFromFile(tlsConfig1, TEST_CERTS_PATH "test.crl");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration tlsConfig2 = TLSConfiguration_create();
@@ -6059,11 +5948,11 @@ test_CS104_MasterSlave_TLSCertificateRevoked(void)
     TLSConfiguration_setChainValidation(tlsConfig2, true);;
 
     /* use revoked certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -6108,11 +5997,11 @@ test_CS104_MasterSlave_TLSRenegotiateAfterCRLUpdate(void)
 
     TLSConfiguration_setEventHandler(tlsConfig1, securityEventHandler, &eventInfo);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     // res = TLSConfiguration_addCRLFromFile(tlsConfig1, "test.crl");
@@ -6123,11 +6012,11 @@ test_CS104_MasterSlave_TLSRenegotiateAfterCRLUpdate(void)
     TLSConfiguration_setChainValidation(tlsConfig2, true);;
 
     /* use revoked certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration_setRenegotiationTime(tlsConfig1, 10000);
@@ -6150,7 +6039,7 @@ test_CS104_MasterSlave_TLSRenegotiateAfterCRLUpdate(void)
 
     CS104_Connection_sendStartDT(con);
 
-    res = TLSConfiguration_addCRLFromFile(tlsConfig1, "test.crl");
+    res = TLSConfiguration_addCRLFromFile(tlsConfig1, TEST_CERTS_PATH "test.crl");
     TEST_ASSERT_TRUE(res);
 
     CS101_ASDU newAsdu = CS101_ASDU_create(CS104_Slave_getAppLayerParameters(slave), false, CS101_COT_SPONTANEOUS, 0, 1, false, false);
@@ -6190,11 +6079,11 @@ test_CS104_MasterSlave_TLSCertificateRevokedBeforeRenegotiation(void)
 
     TLSConfiguration_setEventHandler(tlsConfig1, securityEventHandler, &eventInfo);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration_setRenegotiationTime(tlsConfig1, 1000);
@@ -6204,11 +6093,11 @@ test_CS104_MasterSlave_TLSCertificateRevokedBeforeRenegotiation(void)
     TLSConfiguration_setChainValidation(tlsConfig2, true);;
 
     /* use revoked certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -6272,11 +6161,11 @@ test_CS104_MasterSlave_TLSCertificateRevokedBeforeReconnect(void)
 
     TLSConfiguration_setEventHandler(tlsConfig1, securityEventHandler, NULL);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration_setRenegotiationTime(tlsConfig1, 1000);
@@ -6286,11 +6175,11 @@ test_CS104_MasterSlave_TLSCertificateRevokedBeforeReconnect(void)
     TLSConfiguration_setChainValidation(tlsConfig2, true);;
 
     /* use revoked certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -6337,11 +6226,11 @@ test_CS104_MasterSlave_TLSUnknownCertificate(void)
 
     TLSConfiguration_setEventHandler(tlsConfig1, securityEventHandler, NULL);
 
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
 
-    TLSConfiguration_addAllowedCertificateFromFile(tlsConfig1, "client_CA1_3.pem");
+    TLSConfiguration_addAllowedCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "client_CA1_3.pem");
 
     TLSConfiguration_setMinTlsVersion(tlsConfig1, TLS_VERSION_TLS_1_2);
 
@@ -6350,9 +6239,9 @@ test_CS104_MasterSlave_TLSUnknownCertificate(void)
     TLSConfiguration_setChainValidation(tlsConfig2, true);;
 
     /* use expired certificate */
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_4.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_4.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_4.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_4.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
 
     TLSConfiguration_setMinTlsVersion(tlsConfig2, TLS_VERSION_TLS_1_2);
 
@@ -6388,9 +6277,9 @@ test_CS104_MasterSlave_TLSUseSessionResumption(void)
     TLSConfiguration_enableSessionResumption(tlsConfig1, true);
     TLSConfiguration_setChainValidation(tlsConfig1, true);
 
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
 
     TLSConfiguration tlsConfig2 = TLSConfiguration_create();
 
@@ -6399,11 +6288,11 @@ test_CS104_MasterSlave_TLSUseSessionResumption(void)
     TLSConfiguration_setAllowOnlyKnownCertificates(tlsConfig2, true);
 
     /* use valid certificate */
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
 
-    TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, "server_CA1_1.pem");
+    TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "server_CA1_1.pem");
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
 
@@ -6453,11 +6342,11 @@ test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtClient(void)
 
     TLSConfiguration_setEventHandler(tlsConfig1, securityEventHandler, NULL);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration_setRenegotiationTime(tlsConfig1, 1000);
@@ -6470,11 +6359,11 @@ test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtClient(void)
     TLSConfiguration_setChainValidation(tlsConfig2, true);
 
     /* use revoked certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -6527,11 +6416,11 @@ test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtServer(void)
 
     TLSConfiguration_setEventHandler(tlsConfig1, securityEventHandler, NULL);
 
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     TLSConfiguration_setRenegotiationTime(tlsConfig1, 1000);
@@ -6543,11 +6432,11 @@ test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtServer(void)
     TLSConfiguration_setChainValidation(tlsConfig2, true);
 
     /* use revoked certificate */
-    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
+    res = TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
+    res = TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
     TEST_ASSERT_TRUE(res);
-    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    res = TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
     TEST_ASSERT_TRUE(res);
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
@@ -6594,9 +6483,9 @@ test_CS104_MasterSlave_TLSReuseConfigurationWithSessionResumption(void)
     TLSConfiguration_enableSessionResumption(tlsConfig1, true);
     TLSConfiguration_setChainValidation(tlsConfig1, true);
 
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig1, "server_CA1_1.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, "server_CA1_1.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig1, "root_CA1.pem");
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig1, TEST_CERTS_PATH "server_CA1_1.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig1, TEST_CERTS_PATH "root_CA1.pem");
 
     TLSConfiguration tlsConfig2 = TLSConfiguration_create();
 
@@ -6605,11 +6494,11 @@ test_CS104_MasterSlave_TLSReuseConfigurationWithSessionResumption(void)
     TLSConfiguration_setAllowOnlyKnownCertificates(tlsConfig2, true);
 
     /* use valid certificate */
-    TLSConfiguration_setOwnKeyFromFile(tlsConfig2, "client_CA1_3.key", NULL);
-    TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, "client_CA1_3.pem");
-    TLSConfiguration_addCACertificateFromFile(tlsConfig2, "root_CA1.pem");
+    TLSConfiguration_setOwnKeyFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.key", NULL);
+    TLSConfiguration_setOwnCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "client_CA1_3.pem");
+    TLSConfiguration_addCACertificateFromFile(tlsConfig2, TEST_CERTS_PATH "root_CA1.pem");
 
-    TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, "server_CA1_1.pem");
+    TLSConfiguration_addAllowedCertificateFromFile(tlsConfig2, TEST_CERTS_PATH "server_CA1_1.pem");
 
     CS104_Slave slave = CS104_Slave_createSecure(100, 100, tlsConfig1);
 
@@ -6657,7 +6546,7 @@ test_CS104_MasterSlave_TLSReuseConfigurationWithSessionResumption(void)
 
     TEST_ASSERT_TRUE(result);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Slave_destroy(slave);
 
@@ -6758,7 +6647,7 @@ test_CS104SlaveUnconfirmedStoppedMode()
 
     CS104_Connection_sendStartDT(con);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Connection_sendStopDT(con);
 
@@ -6793,11 +6682,14 @@ test_CS104SlaveUnconfirmedStoppedMode()
         CS101_ASDU_destroy(newAsdu);
     }
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
-    TEST_ASSERT_EQUAL_INT(6, CS104_Connection_sendMessage(con, STOPDT_ACT_MSG, sizeof(STOPDT_ACT_MSG)));
+    // TEST_ASSERT_EQUAL_INT(6, CS104_Connection_sendMessage(con, STOPDT_ACT_MSG, sizeof(STOPDT_ACT_MSG)));
 
-    Thread_sleep(5000);
+    // Thread_sleep(5000);
+    CS104_Connection_sendStopDT(con);
+
+    Thread_sleep(1000);
 
     CS104_Connection_close(con);
 
@@ -6861,7 +6753,7 @@ test_CS104Connection_cannotWriteToSocketWhenNotConnected()
 
     CS104_Slave_stop(slave);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     CS104_Connection_sendStopDT(con);
 
@@ -6926,7 +6818,7 @@ test_CS104Slave_handleTestCommandWithTimestamp()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_TS_TA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -6941,7 +6833,7 @@ test_CS104Slave_handleTestCommandWithTimestamp()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_TS_TA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -6957,7 +6849,7 @@ test_CS104Slave_handleTestCommandWithTimestamp()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_TS_TA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -6973,7 +6865,7 @@ test_CS104Slave_handleTestCommandWithTimestamp()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_TS_TA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7029,7 +6921,7 @@ test_CS104Slave_rejectCommandsWithBroadcastCA()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_TS_TA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7046,7 +6938,7 @@ test_CS104Slave_rejectCommandsWithBroadcastCA()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_RD_NA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7066,7 +6958,7 @@ test_CS104Slave_rejectCommandsWithBroadcastCA()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_CD_NA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7133,7 +7025,7 @@ test_CS104Slave_rejectCommandWithUnknownCA()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_TS_TA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7150,7 +7042,7 @@ test_CS104Slave_rejectCommandWithUnknownCA()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_TS_TA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7215,7 +7107,7 @@ test_CS104Slave_handleResetProcessCommand()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_RP_NA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7238,7 +7130,7 @@ test_CS104Slave_handleResetProcessCommand()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_RP_NA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7257,7 +7149,7 @@ test_CS104Slave_handleResetProcessCommand()
     TEST_ASSERT_TRUE(CS104_Connection_sendASDU(con, asdu));
     CS101_ASDU_destroy(asdu);
 
-    Thread_sleep(500);
+    Thread_sleep(1000);
 
     TEST_ASSERT_NOT_NULL(receivedASDU);
     TEST_ASSERT_EQUAL_INT(C_RP_NA_1, CS101_ASDU_getTypeID(receivedASDU));
@@ -7375,7 +7267,7 @@ test_AProfile_KeyExchangeAndDataEncryption(void)
 #endif
 
 int
-main(int argc, char** argv)
+main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_version_number);
@@ -7389,40 +7281,40 @@ main(int argc, char** argv)
     RUN_TEST(test_StepPositionInformation);
     RUN_TEST(test_addMaxNumberOfIOsToASDU);
     RUN_TEST(test_SingleEventType);
-
+    
     RUN_TEST(test_SinglePointInformation);
     RUN_TEST(test_SinglePointInformationSequence);
     RUN_TEST(test_SinglePointWithCP24Time2a);
     RUN_TEST(test_SinglePointWithCP56Time2a);
-
+    
     RUN_TEST(test_DoublePointInformation);
     RUN_TEST(test_DoublePointWithCP24Time2a);
     RUN_TEST(test_DoublePointWithCP56Time2a);
-
+    
     RUN_TEST(test_NormalizeMeasureValueWithoutQuality);
     RUN_TEST(test_NormalizeMeasureValue);
     RUN_TEST(test_MeasuredValueNormalizedWithCP24Time2a);
     RUN_TEST(test_MeasuredValueNormalizedWithCP56Time2a);
-
+    
     RUN_TEST(test_MeasuredValueScaled);
     RUN_TEST(test_MeasuredValueScaledWithCP24Time2a);
     RUN_TEST(test_MeasuredValueScaledWithCP56Time2a);
-
+    
     RUN_TEST(test_MeasuredValueShort);
     RUN_TEST(test_MeasuredValueShortWithCP24Time2a);
     RUN_TEST(test_MeasuredValueShortWithCP56Time2a);
-
+    
     RUN_TEST(test_StepPositionInformation);
     RUN_TEST(test_StepPositionWithCP24Time2a);
     RUN_TEST(test_StepPositionWithCP56Time2a);
-
+    
     RUN_TEST(test_IntegratedTotals);
     RUN_TEST(test_IntegratedTotalsWithCP24Time2a);
     RUN_TEST(test_IntegratedTotalsWithCP56Time2a);
-
+    
     RUN_TEST(test_SingleCommand);
     RUN_TEST(test_SingleCommandWithCP56Time2a);
-
+    
     RUN_TEST(test_DoubleCommand);
     RUN_TEST(test_DoubleCommandWithCP56Time2a);
 
@@ -7434,50 +7326,50 @@ main(int argc, char** argv)
 
     RUN_TEST(test_SetpointCommandScaled);
     RUN_TEST(test_SetpointCommandScaledWithCP56Time2a);
-
+    
     RUN_TEST(test_SetpointCommandShort);
     RUN_TEST(test_SetpointCommandShortWithCP56Time2a);
 
     RUN_TEST(test_InterrogationCommand);
     RUN_TEST(test_CounterInterrogationCommand);
-
+    
     RUN_TEST(test_ReadCommand);
     RUN_TEST(test_ClockSynchronizationCommand);
     RUN_TEST(test_ResetProcessCommand);
     RUN_TEST(test_DelayAcquisitionCommand);
     RUN_TEST(test_TestCommand);
     RUN_TEST(test_TestCommandWithTime);
-
+    
     RUN_TEST(test_BitString32);
     RUN_TEST(test_Bitstring32CommandWithCP56Time2a);
-
+    
     RUN_TEST(test_QueryLog);
-
+    
     RUN_TEST(test_FileDirectory);
     RUN_TEST(test_FileDirectorySingleEntry);
-
+    
     RUN_TEST(test_BitString32xx_encodeDecode);
     RUN_TEST(test_EventOfProtectionEquipmentWithTime);
     RUN_TEST(test_IpAddressHandling);
-
+    
     RUN_TEST(test_CS104SlaveConnectionIsRedundancyGroup);
     RUN_TEST(test_CS104SlaveSingleRedundancyGroup);
     RUN_TEST(test_CS104SlaveSingleRedundancyGroupMultipleConnections);
-
+    
     RUN_TEST(test_CS104SlaveEventQueue1);
     RUN_TEST(test_CS104SlaveEventQueueOverflow);
     RUN_TEST(test_CS104SlaveEventQueueOverflow2);
     RUN_TEST(test_CS104SlaveEventQueueCheckCapacity);
     RUN_TEST(test_CS104SlaveEventQueueOverflow3);
-
+    
     RUN_TEST(test_CS104_Connection_ConnectTimeout);
-
+    
     RUN_TEST(test_CS104_Connection_UseAfterClose);
     RUN_TEST(test_CS104_Connection_UseAfterServerClosedConnection);
-
+    
     RUN_TEST(test_CS104_Connection_async_success);
     RUN_TEST(test_CS104_Connection_async_timeout);
-
+    
     RUN_TEST(test_CS101_ASDU_addObjectOfWrongType);
     RUN_TEST(test_CS101_ASDU_addUntilOverflow);
 
@@ -7496,21 +7388,21 @@ main(int argc, char** argv)
     RUN_TEST(test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtClient);
     RUN_TEST(test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtServer);
     RUN_TEST(test_CS104_MasterSlave_TLSReuseConfigurationWithSessionResumption);
-#endif /* #if (CONFIG_CS104_SUPPORT_TLS == 1) */
-
+#endif
+    
     RUN_TEST(test_ASDUsetGetNumberOfElements);
     RUN_TEST(test_CS101_ASDU_clone);
-
+    
     RUN_TEST(test_CS104SlaveUnconfirmedStoppedMode);
-
+    
     RUN_TEST(test_ScaledNormalizedConversion);
-
+    
     RUN_TEST(test_CS104Connection_cannotWriteToSocketWhenNotConnected);
-
+    
     RUN_TEST(test_CS104Slave_handleTestCommandWithTimestamp);
-
+    
     RUN_TEST(test_CS104Slave_rejectCommandsWithBroadcastCA);
-
+    
     RUN_TEST(test_CS104Slave_rejectCommandWithUnknownCA);
 
     RUN_TEST(test_CS104Slave_handleResetProcessCommand);

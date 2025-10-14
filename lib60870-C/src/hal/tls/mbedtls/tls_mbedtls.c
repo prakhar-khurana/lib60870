@@ -590,13 +590,14 @@ udpatedCRL(TLSConfiguration self)
 
     if (self->conf.endpoint == MBEDTLS_SSL_IS_SERVER)
     {
-        mbedtls_ssl_cache_entry *cur = self->cache.chain;
-
-        while (cur)
-        {
-            cur->timestamp = 0;
-            cur = cur->next;
-        }
+        // mbedtls_ssl_cache_entry *cur = self->cache.chain;
+        // while (cur)
+        // {
+        //     cur->timestamp = 0;
+        //     cur = cur->next;
+        // }
+        mbedtls_ssl_cache_free(&(self->cache));
+        mbedtls_ssl_cache_init(&(self->cache));
     }
 }
 
@@ -756,12 +757,18 @@ createSecurityEvents(TLSConfiguration config, int ret, uint32_t flags, TLSSocket
         break;
 
     default:
+        // {
+        //     char errBuf[128];
+        //     mbedtls_strerror(ret, errBuf, 127);
+        //     errBuf[127] = 0;
+        //     char msgBuf[256];
+        //     snprintf(msgBuf, 255, "Alarm: handshake failed for unknown reason (err: %s)", errBuf);
+        //     msgBuf[255] = 0;
+        //     raiseSecurityEvent(config,TLS_SEC_EVT_INCIDENT, TLS_EVENT_CODE_ALM_HANDSHAKE_FAILED_UNKNOWN_REASON, msgBuf, socket);
+        // }
         {
-            char errBuf[128];
-            mbedtls_strerror(ret, errBuf, 127);
-            errBuf[127] = 0;
             char msgBuf[256];
-            snprintf(msgBuf, 255, "Alarm: handshake failed for unknown reason (err: %s)", errBuf);
+            snprintf(msgBuf, 255, "Alarm: handshake failed for unknown reason (err: -0x%04x)", -ret);
             msgBuf[255] = 0;
             raiseSecurityEvent(config,TLS_SEC_EVT_INCIDENT, TLS_EVENT_CODE_ALM_HANDSHAKE_FAILED_UNKNOWN_REASON, msgBuf, socket);
         }

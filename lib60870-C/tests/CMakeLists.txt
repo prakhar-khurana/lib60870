@@ -2,7 +2,7 @@ include_directories(
    ./unity
 )
 
-add_definitions(-DUNITY_INCLUDE_CONFIG_H)
+target_compile_definitions(tests PRIVATE UNITY_INCLUDE_CONFIG_H)
 
 set(tests_SRCS
    "${CMAKE_CURRENT_LIST_DIR}/all_tests.c"

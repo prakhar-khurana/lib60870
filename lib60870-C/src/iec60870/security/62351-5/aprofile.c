@@ -114,8 +114,11 @@ AProfile_onStartDT(AProfileContext self)
     int ret;
 
     printf("APROFILE: StartDT received, initiating key exchange\n");
-
-    ret = mbedtls_ecp_group_load(&self->ecdh.grp, MBEDTLS_ECP_DP_SECP256R1);
+    
+    // /*****************************************************************
+    //  * #FIX: Use direct struct access for mbedtls v2.x compatibility. *
+    //  *****************************************************************/
+    ret = mbedtls_ecp_group_load(&self->ecdh.ctx.mbed_ecdh.grp, MBEDTLS_ECP_DP_SECP256R1);
     if (ret != 0) {
         printf("APROFILE: Failed to setup ECP group\n");
         mbedtls_ecdh_free(&self->ecdh);
@@ -123,14 +126,15 @@ AProfile_onStartDT(AProfileContext self)
     }
 
     size_t olen = 0;
-    ret = mbedtls_ecdh_gen_public(&self->ecdh.grp, &self->ecdh.d, &self->ecdh.Q, mbedtls_ctr_drbg_random, &self->ctr_drbg);
+    // ret = mbedtls_ecdh_gen_public(&self->ecdh.grp, &self->ecdh.d, &self->ecdh.Q, mbedtls_ctr_drbg_random, &self->ctr_drbg);
+    ret = mbedtls_ecdh_make_public(&self->ecdh, &olen, self->localPublicKey, sizeof(self->localPublicKey), mbedtls_ctr_drbg_random, &self->ctr_drbg);
     if (ret != 0) {
         printf("APROFILE: Failed to generate public key\n");
         mbedtls_ecdh_free(&self->ecdh);
         return false;
     }
 
-    ret = mbedtls_ecp_point_write_binary(&self->ecdh.grp, &self->ecdh.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &olen, self->localPublicKey, sizeof(self->localPublicKey));
+    // ret = mbedtls_ecp_point_write_binary(&self->ecdh.grp, &self->ecdh.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &olen, self->localPublicKey, sizeof(self->localPublicKey));
     if (ret != 0) {
         printf("APROFILE: Failed to write public key\n");
         mbedtls_ecdh_free(&self->ecdh);

@@ -90,10 +90,10 @@ set (libhal_SRCS
     ${libhal_windows_SRCS}
 )
 
-IF(MSVC)
-set_source_files_properties(${libhal_SRCS}
-                                       PROPERTIES LANGUAGE CXX)
-ENDIF()
+# IF(MSVC)
+# set_source_files_properties(${libhal_SRCS}
+#                                        PROPERTIES LANGUAGE CXX)
+# ENDIF()
 
 ELSEIF(UNIX)
 IF(APPLE)
@@ -142,10 +142,10 @@ set (libhal_SRCS ${libhal_SRCS}
   ${CMAKE_CURRENT_LIST_DIR}/tls/mbedtls/tls_mbedtls.c
 )
 
-IF(MSVC)
-set_source_files_properties(${libhal_SRCS}
-                                       PROPERTIES LANGUAGE CXX)
-ENDIF()
+# IF(MSVC)
+# set_source_files_properties(${libhal_SRCS}
+#                                        PROPERTIES LANGUAGE CXX)
+# ENDIF()
 
 list (APPEND libhal_SRCS ${tls_SRCS})
 
@@ -169,17 +169,17 @@ set (libhal_SRCS ${libhal_SRCS}
   ${CMAKE_CURRENT_LIST_DIR}/tls/mbedtls3/tls_mbedtls.c
 )
 
-IF(MSVC)
-set_source_files_properties(${libhal_SRCS}
-                                       PROPERTIES LANGUAGE CXX)
-ENDIF()
+# IF(MSVC)
+# set_source_files_properties(${libhal_SRCS}
+#                                        PROPERTIES LANGUAGE CXX)
+# ENDIF()
 
 list (APPEND libhal_SRCS ${tls_SRCS})
 endif(WITH_MBEDTLS3)
 
 add_library (hal STATIC ${libhal_SRCS})
 
-add_library (hal-shared STATIC ${libhal_SRCS})
+add_library (hal-shared SHARED ${libhal_SRCS})
 
 target_compile_definitions(hal-shared PRIVATE EXPORT_FUNCTIONS_FOR_DLL)
 
@@ -200,16 +200,21 @@ ENDIF(CONFIG_USE_EXTERNAL_MBEDTLS_DYNLIB)
 
 IF(MINGW)
   target_link_libraries(hal ws2_32 iphlpapi bcrypt)
+  target_link_libraries(hal-shared ws2_32 iphlpapi bcrypt)
   message("Building with MinGW")
 ENDIF(MINGW)
 
 IF (MSVC)
-  target_link_libraries(hal bcrypt)
-  target_link_libraries(hal-shared bcrypt)
+  target_link_libraries(hal bcrypt legacy_stdio_definitions)
+  target_link_libraries(hal-shared bcrypt legacy_stdio_definitions)
 ENDIF()
 
 iF(WITH_WPCAP)
 target_link_libraries(hal
+	${CMAKE_CURRENT_SOURCE_DIR}/../third_party/winpcap/Lib/wpcap.lib
+	${CMAKE_CURRENT_SOURCE_DIR}/../third_party/winpcap/Lib/packet.lib
+)
+target_link_libraries(hal-shared
 	${CMAKE_CURRENT_SOURCE_DIR}/../third_party/winpcap/Lib/wpcap.lib
 	${CMAKE_CURRENT_SOURCE_DIR}/../third_party/winpcap/Lib/packet.lib
 )
