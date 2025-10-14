@@ -122,7 +122,7 @@ AProfile_onStartDT(AProfileContext self)
 
     printf("APROFILE: StartDT received, initiating key exchange\n");
     
-    /* Use high-level mbedtls 2.x ECDH API */
+    /* Setup ECDH context with SECP256R1 curve using high-level API */
     ret = mbedtls_ecdh_setup(&self->ecdh, MBEDTLS_ECP_DP_SECP256R1);
     if (ret != 0) {
         printf("APROFILE: Failed to setup ECDH context (error: -0x%04x)\n", -ret);
@@ -131,7 +131,8 @@ AProfile_onStartDT(AProfileContext self)
 
     /* Generate our key pair and export public key */
     size_t olen = 0;
-    ret = mbedtls_ecdh_make_public(&self->ecdh, &olen, self->localPublicKey, sizeof(self->localPublicKey),
+    ret = mbedtls_ecdh_make_public(&self->ecdh, &olen, 
+                                    self->localPublicKey, sizeof(self->localPublicKey),
                                     mbedtls_ctr_drbg_random, &self->ctr_drbg);
     if (ret != 0) {
         printf("APROFILE: Failed to generate public key (error: -0x%04x)\n", -ret);

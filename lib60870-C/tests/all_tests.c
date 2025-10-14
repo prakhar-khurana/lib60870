@@ -6477,8 +6477,8 @@ test_CS104_MasterSlave_TLSCertificateSessionResumptionExpiredAtServer(void)
 
     Thread_sleep(2000);
 
-    /* update CRL -> expect renegotiation to fail! */
-    res = TLSConfiguration_addCRLFromFile(tlsConfig1, "test.crl");
+    /* update CRL -> expect reconnection to fail! */
+    res = TLSConfiguration_addCRLFromFile(tlsConfig1, TEST_CERTS_PATH "test.crl");
     TEST_ASSERT_TRUE(res);
 
     result = CS104_Connection_connect(con);
