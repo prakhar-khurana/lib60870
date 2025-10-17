@@ -44,11 +44,13 @@ typedef enum {
 struct sAProfileContext
 {
     bool security_active;
+    bool isClient; /* true for client (CS104_Connection), false for server (MasterConnection) */
     uint32_t local_sequence_number;
     uint32_t remote_sequence_number;
 
     void* connection; /* Reference to the CS104_Connection or MasterConnection */
     AProfile_SendAsduCallback sendAsdu;
+    CS101_AppLayerParameters parameters; /* Application layer parameters for ASDU creation */
 
     KeyExchangeState keyExchangeState;
 

@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "apl_types_internal.h"
 #include "cs101_information_objects.h"
@@ -8130,14 +8131,7 @@ QueryLog_create(QueryLog self, int ioa, uint16_t nof, const CP56Time2a rangeStar
  * SecurityPublicKey : InformationObject
  *************************************************/
 
-struct sSecurityPublicKey
-{
-    int objectAddress;
-    TypeID type;
-    InformationObjectVFT virtualFunctionTable;
-    int keyLength;
-    uint8_t keyValue[256];
-};
+/* Structure definition moved to information_objects_internal.h */
 
 static bool
 SecurityPublicKey_encode(SecurityPublicKey self, Frame frame, CS101_AppLayerParameters parameters, bool isSequence)
@@ -8228,11 +8222,19 @@ SecurityPublicKey_getFromBuffer(SecurityPublicKey self, CS101_AppLayerParameters
 
         if (!isSequence)
         {
+            printf("APROFILE: SecurityPublicKey_getFromBuffer - parsing IOA from buffer at startIndex=%d, sizeOfIOA=%d\n", startIndex, parameters->sizeOfIOA);
+            printf("APROFILE: Buffer bytes: [0]=%02x [1]=%02x [2]=%02x [3]=%02x\n", msg[0], msg[1], msg[2], msg[3]);
+            fflush(stdout);
+            
             InformationObject_getFromBuffer((InformationObject)self, parameters, msg, startIndex);
             if (self == NULL) {
                 DEBUG_PRINT("InformationObject_getFromBuffer returned NULL\n");
                 return NULL;
             }
+            
+            printf("APROFILE: Parsed IOA=%d\n", self->objectAddress);
+            fflush(stdout);
+            
             startIndex += parameters->sizeOfIOA;
         }
 
@@ -8247,16 +8249,7 @@ SecurityPublicKey_getFromBuffer(SecurityPublicKey self, CS101_AppLayerParameters
  * SecurityEncryptedData : InformationObject
  *************************************************/
 
-struct sSecurityEncryptedData
-{
-    int objectAddress;
-    TypeID type;
-    InformationObjectVFT virtualFunctionTable;
-    uint8_t nonce[12];
-    uint8_t tag[16];
-    int ciphertextLength;
-    uint8_t ciphertext[256];
-};
+/* Structure definition moved to information_objects_internal.h */
 
 static bool
 SecurityEncryptedData_encode(SecurityEncryptedData self, Frame frame, CS101_AppLayerParameters parameters, bool isSequence)

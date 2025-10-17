@@ -15,7 +15,7 @@ struct sCS101_ASDU;
 struct sT104Frame;
 
 AProfileContext
-AProfile_create(void* connection, bool (*sendAsduCallback)(void*, struct sCS101_ASDU*));
+AProfile_create(void* connection, bool (*sendAsduCallback)(void*, struct sCS101_ASDU*), CS101_AppLayerParameters parameters, bool isClient);
 
 void
 AProfile_destroy(AProfileContext self);

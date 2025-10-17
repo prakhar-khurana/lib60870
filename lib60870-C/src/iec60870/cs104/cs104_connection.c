@@ -210,9 +210,16 @@ sendSMessage(CS104_Connection self)
 static int
 sendIMessage(CS104_Connection self, Frame frame)
 {
+    printf("APROFILE: sendIMessage - preparing frame\n");
+    fflush(stdout);
     T104Frame_prepareToSend((T104Frame)frame, self->sendCount, self->receiveCount);
 
+    printf("APROFILE: sendIMessage - writing to socket (size=%d)\n", T104Frame_getMsgSize(frame));
+    fflush(stdout);
     writeToSocket(self, T104Frame_getBuffer(frame), T104Frame_getMsgSize(frame));
+
+    printf("APROFILE: sendIMessage - socket write complete\n");
+    fflush(stdout);
 
     self->sendCount = (self->sendCount + 1) % 32768;
 
@@ -220,6 +227,9 @@ sendIMessage(CS104_Connection self, Frame frame)
     self->timeoutT2Trigger = false;
 
     int sendCount = self->sendCount;
+
+    printf("APROFILE: sendIMessage - returning sendCount=%d\n", sendCount);
+    fflush(stdout);
 
     return sendCount;
 }
@@ -1241,7 +1251,7 @@ CS104_Connection_setSecurityConfig(CS104_Connection self, const CS104_SecurityCo
     if (self->sec)
         AProfile_destroy(self->sec);
 
-    self->sec = AProfile_create(self, cs104Client_sendAsdu);
+    self->sec = AProfile_create(self, cs104Client_sendAsdu, &(self->alParameters), true); /* true = client */
 }
 
 void
@@ -1369,26 +1379,61 @@ sendASDUInternal(CS104_Connection self, Frame frame)
 {
     bool retVal = false;
 
+    printf("APROFILE: sendASDUInternal called, isRunning=%d\n", isRunning(self));
+    fflush(stdout);
+
     if (isRunning(self))
     {
 #if (CONFIG_USE_SEMAPHORES == 1)
+        printf("APROFILE: Waiting for conStateLock semaphore...\n");
+        fflush(stdout);
         Semaphore_wait(self->conStateLock);
+        printf("APROFILE: Acquired conStateLock semaphore\n");
+        fflush(stdout);
 #endif
 
+        printf("APROFILE: Checking if buffer is full...\n");
+        fflush(stdout);
         if (isSentBufferFull(self) == false)
         {
+            printf("APROFILE: Buffer not full, proceeding to send\n");
+            fflush(stdout);
             #if (CONFIG_CS104_APROFILE == 1)
             if (self->sec && AProfile_ready(self->sec))
+            {
+                printf("APROFILE: AProfile is ready, wrapping ASDU\n");
+                fflush(stdout);
                 AProfile_wrapOutAsdu(self->sec, (T104Frame)frame);
+            }
+            else
+            {
+                printf("APROFILE: AProfile not ready (sec=%p, ready=%d), sending unwrapped\n", 
+                       (void*)self->sec, self->sec ? AProfile_ready(self->sec) : 0);
+                fflush(stdout);
+            }
             #endif
 
             sendIMessageAndUpdateSentASDUs(self, frame);
             retVal = true;
+            printf("APROFILE: ASDU sent successfully\n");
+            fflush(stdout);
+        }
+        else
+        {
+            printf("APROFILE: Buffer is full, cannot send\n");
+            fflush(stdout);
         }
 
 #if (CONFIG_USE_SEMAPHORES == 1)
         Semaphore_post(self->conStateLock);
+        printf("APROFILE: Released conStateLock semaphore\n");
+        fflush(stdout);
 #endif
+    }
+    else
+    {
+        printf("APROFILE: Connection not running, cannot send\n");
+        fflush(stdout);
     }
 
     T104Frame_destroy(frame);
@@ -1513,11 +1558,51 @@ CS104_Connection_sendProcessCommandEx(CS104_Connection self, CS101_CauseOfTransm
 bool
 CS104_Connection_sendASDU(CS104_Connection self, CS101_ASDU asdu)
 {
+    printf("APROFILE: CS104_Connection_sendASDU called, TypeID=%d\n", CS101_ASDU_getTypeID(asdu));
+    fflush(stdout);
+    
     Frame frame = (Frame)T104Frame_create();
+    printf("APROFILE: Frame created: %p\n", (void*)frame);
+    fflush(stdout);
 
+    printf("APROFILE: Encoding ASDU...\n");
+    fflush(stdout);
     CS101_ASDU_encode(asdu, frame);
+    printf("APROFILE: ASDU encoded\n");
+    fflush(stdout);
 
-    return sendASDUInternal(self, frame);
+#if (CONFIG_CS104_APROFILE == 1)
+    /* For security control messages (S_RP_NA_1 = key exchange), send directly without locking
+     * to avoid deadlock when called from receive thread */
+    if (CS101_ASDU_getTypeID(asdu) == S_RP_NA_1) {
+        printf("APROFILE: Security control message detected, sending without lock\n");
+        fflush(stdout);
+        
+        /* Check running state directly without semaphore to avoid deadlock */
+        if (self->running) {
+            printf("APROFILE: Connection is running, sending key exchange\n");
+            fflush(stdout);
+            sendIMessageAndUpdateSentASDUs(self, frame);
+            T104Frame_destroy(frame);
+            printf("APROFILE: Security message sent successfully\n");
+            fflush(stdout);
+            return true;
+        } else {
+            T104Frame_destroy(frame);
+            printf("APROFILE: Connection not running\n");
+            fflush(stdout);
+            return false;
+        }
+    }
+#endif
+
+    printf("APROFILE: Calling sendASDUInternal...\n");
+    fflush(stdout);
+    bool result = sendASDUInternal(self, frame);
+    printf("APROFILE: sendASDUInternal returned: %d\n", result);
+    fflush(stdout);
+    
+    return result;
 }
 
 bool

@@ -38,7 +38,7 @@
 #if (CONFIG_CS104_APROFILE == 1)
 
 AProfileContext
-AProfile_create(void* connection, AProfile_SendAsduCallback sendAsduCallback)
+AProfile_create(void* connection, AProfile_SendAsduCallback sendAsduCallback, CS101_AppLayerParameters parameters, bool isClient)
 {
     AProfileContext self = (AProfileContext) GLOBAL_CALLOC(1, sizeof(struct sAProfileContext));
 
@@ -47,8 +47,11 @@ AProfile_create(void* connection, AProfile_SendAsduCallback sendAsduCallback)
 
     self->connection = connection;
     self->sendAsdu = sendAsduCallback;
+    self->parameters = parameters;
+    self->isClient = isClient;
 
     mbedtls_gcm_init(&self->gcm_encrypt);
+    
     mbedtls_ecdh_init(&self->ecdh);
     
     /* For mbedtls 2.x with new context, set point format */
@@ -95,7 +98,7 @@ AProfile_destroy(AProfileContext self)
 #else /* CONFIG_CS104_APROFILE == 0 */
 
 AProfileContext
-AProfile_create(void* connection, void* sendAsduCallback)
+AProfile_create(void* connection, void* sendAsduCallback, CS101_AppLayerParameters parameters)
 {
     AProfileContext self = (AProfileContext) GLOBAL_CALLOC(1, sizeof(struct sAProfileContext));
     if (self) {
@@ -118,46 +121,99 @@ bool
 AProfile_onStartDT(AProfileContext self)
 {
 #if (CONFIG_CS104_APROFILE == 1)
+    /* Prevent multiple key exchanges */
+    if (self->keyExchangeState != KEY_EXCHANGE_IDLE) {
+        printf("APROFILE: Key exchange already in progress or complete (state=%d)\n", self->keyExchangeState);
+        return true;
+    }
+
+    /* Only client initiates key exchange */
+    if (!self->isClient) {
+        printf("APROFILE: Server waiting for client key exchange\n");
+        return true;
+    }
+
     int ret;
 
-    printf("APROFILE: StartDT received, initiating key exchange\n");
+    /* Free and re-initialize the group to ensure clean state */
+    mbedtls_ecp_group_free(&self->ecdh.grp);
+    mbedtls_ecp_group_init(&self->ecdh.grp);
     
-    /* Setup ECDH context with SECP256R1 curve using high-level API */
-    ret = mbedtls_ecdh_setup(&self->ecdh, MBEDTLS_ECP_DP_SECP256R1);
+    /* Initialize ECDH context and load the curve */
+    ret = mbedtls_ecp_group_load(&self->ecdh.grp, MBEDTLS_ECP_DP_SECP256R1);
     if (ret != 0) {
-        printf("APROFILE: Failed to setup ECDH context (error: -0x%04x)\n", -ret);
+        printf("APROFILE: Failed to load ECC group (error: -0x%04x)\n", -ret);
         return false;
     }
 
-    /* Generate our key pair and export public key */
-    size_t olen = 0;
-    ret = mbedtls_ecdh_make_public(&self->ecdh, &olen, 
-                                    self->localPublicKey, sizeof(self->localPublicKey),
-                                    mbedtls_ctr_drbg_random, &self->ctr_drbg);
+    /* Generate our ECDH key pair using low-level ECP API */
+    ret = mbedtls_ecdh_gen_public(&self->ecdh.grp, &self->ecdh.d, &self->ecdh.Q,
+                                   mbedtls_ctr_drbg_random, &self->ctr_drbg);
     if (ret != 0) {
-        printf("APROFILE: Failed to generate public key (error: -0x%04x)\n", -ret);
+        printf("APROFILE: Failed to generate ECDH key pair (error: -0x%04x)\n", -ret);
+        return false;
+    }
+
+    /* Export public key to buffer */
+    printf("APROFILE: Exporting public key\n");
+    fflush(stdout);
+    size_t olen = 0;
+    ret = mbedtls_ecp_point_write_binary(&self->ecdh.grp, &self->ecdh.Q,
+                                          MBEDTLS_ECP_PF_UNCOMPRESSED, &olen,
+                                          self->localPublicKey, sizeof(self->localPublicKey));
+    printf("APROFILE: Export returned: %d, olen=%zu\n", ret, olen);
+    fflush(stdout);
+    if (ret != 0) {
+        printf("APROFILE: Failed to export public key (error: -0x%04x)\n", -ret);
         return false;
     }
 
     self->localPublicKeyLen = (int)olen;
 
+    printf("APROFILE: Creating key exchange ASDU\n");
+    fflush(stdout);
     /* Create and send key exchange ASDU with the public key */
-    CS101_ASDU asdu = CS101_ASDU_create(NULL, false, CS101_COT_AUTHENTICATION, 0, 0, false, false);
+    CS101_ASDU asdu = CS101_ASDU_create(self->parameters, false, CS101_COT_AUTHENTICATION, 0, 0, false, false);
+    printf("APROFILE: ASDU created: %p\n", (void*)asdu);
+    fflush(stdout);
     if (!asdu) return false;
 
     CS101_ASDU_setTypeID(asdu, S_RP_NA_1);
+    printf("APROFILE: TypeID set to S_RP_NA_1\n");
+    fflush(stdout);
 
     SecurityPublicKey spk = SecurityPublicKey_create(NULL, 65535, self->localPublicKeyLen, self->localPublicKey);
+    printf("APROFILE: SecurityPublicKey created: %p\n", (void*)spk);
+    fflush(stdout);
     if (!spk) {
         CS101_ASDU_destroy(asdu);
         return false;
     }
+    printf("APROFILE: Adding information object to ASDU...\n");
+    fflush(stdout);
     CS101_ASDU_addInformationObject(asdu, (InformationObject)spk);
+    printf("APROFILE: Information object added\n");
+    fflush(stdout);
     SecurityPublicKey_destroy(spk);
+    printf("APROFILE: SecurityPublicKey destroyed\n");
+    fflush(stdout);
 
+    printf("APROFILE: About to send key exchange ASDU (sendAsdu=%p)\n", (void*)self->sendAsdu);
+    fflush(stdout);
+    
     if (self->sendAsdu) {
-        self->sendAsdu(self->connection, asdu);
+        printf("APROFILE: Calling sendAsdu callback...\n");
+        fflush(stdout);
+        bool sent = self->sendAsdu(self->connection, asdu);
+        printf("APROFILE: Key exchange ASDU sent (result=%d)\n", sent);
+        fflush(stdout);
     }
+    else {
+        printf("APROFILE: ERROR - sendAsdu callback is NULL!\n");
+        fflush(stdout);
+    }
+
+    CS101_ASDU_destroy(asdu);
 
     self->keyExchangeState = KEY_EXCHANGE_AWAIT_REPLY;
 
@@ -185,44 +241,106 @@ AProfile_wrapOutAsdu(AProfileContext self, T104Frame frame)
         return true; /* Do nothing if security is not active */
     }
 
-    uint8_t* asdu_buffer = T104Frame_getBuffer((Frame)frame) + 6;
-    int asdu_len = T104Frame_getMsgSize((Frame)frame) - 6;
+    /* Use Frame interface instead of T104Frame to avoid type mismatch issues */
+    Frame genericFrame = (Frame)frame;
+    uint8_t* frame_buffer = Frame_getBuffer(genericFrame);
+    uint8_t* asdu_buffer = frame_buffer + 6;
+    int frame_size = Frame_getMsgSize(genericFrame);
+    int asdu_len = frame_size - 6;
 
+    /* Save original ASDU for encryption */
+    printf("APROFILE: Frame details - frame_size=%d, asdu_len=%d\n", frame_size, asdu_len);
+    fflush(stdout);
+    printf("APROFILE: Allocating memory for original ASDU (len=%d)\n", asdu_len);
+    fflush(stdout);
+    uint8_t* original_asdu = (uint8_t*)GLOBAL_MALLOC(asdu_len);
+    if (!original_asdu) {
+        printf("APROFILE: Failed to allocate original_asdu\n");
+        fflush(stdout);
+        return false;
+    }
+    memcpy(original_asdu, asdu_buffer, asdu_len);
+    printf("APROFILE: Copied ASDU to buffer\n");
+    fflush(stdout);
+
+    /* Generate nonce: 4 bytes sequence number + 8 bytes random */
     uint8_t nonce[12];
+    memcpy(nonce, &self->local_sequence_number, 4);
+    printf("APROFILE: Generating random nonce...\n");
+    fflush(stdout);
+    mbedtls_ctr_drbg_random(&self->ctr_drbg, nonce + 4, 8);
+    printf("APROFILE: Nonce generated\n");
+    fflush(stdout);
+
     uint8_t tag[16];
+    printf("APROFILE: Allocating ciphertext buffer\n");
+    fflush(stdout);
     uint8_t* ciphertext = (uint8_t*)GLOBAL_MALLOC(asdu_len);
-    if (!ciphertext) return false;
+    if (!ciphertext) {
+        printf("APROFILE: Failed to allocate ciphertext\n");
+        fflush(stdout);
+        GLOBAL_FREEMEM(original_asdu);
+        return false;
+    }
 
-    /* Generate nonce */
-    mbedtls_ctr_drbg_random(&self->ctr_drbg, nonce, 12);
-
-    /* Encrypt */
-    int ret = mbedtls_gcm_crypt_and_tag(&self->gcm_encrypt, MBEDTLS_GCM_ENCRYPT, asdu_len, nonce, 12, NULL, 0, asdu_buffer, ciphertext, 16, tag);
+    /* Encrypt ASDU using AES-GCM */
+    printf("APROFILE: Starting GCM encryption (len=%d)...\n", asdu_len);
+    fflush(stdout);
+    int ret = mbedtls_gcm_crypt_and_tag(&self->gcm_encrypt, MBEDTLS_GCM_ENCRYPT, 
+                                        asdu_len, nonce, 12, NULL, 0, 
+                                        original_asdu, ciphertext, 16, tag);
+    printf("APROFILE: GCM encryption completed (ret=%d)\n", ret);
+    fflush(stdout);
+    
+    GLOBAL_FREEMEM(original_asdu);
+    
     if (ret != 0) {
-        printf("APROFILE: Failed to encrypt ASDU\n");
+        printf("APROFILE: Encryption failed (error: -0x%04x)\n", -ret);
+        fflush(stdout);
         GLOBAL_FREEMEM(ciphertext);
         return false;
     }
 
-    /* Create new ASDU with encrypted data */
-    T104Frame_resetFrame((Frame)frame);
-    T104Frame_setNextByte((Frame)frame, S_SE_NA_1); /* Type ID for secure ASDU */
-    T104Frame_setNextByte((Frame)frame, 1); /* VSQ */
-    T104Frame_setNextByte((Frame)frame, CS101_COT_SPONTANEOUS); /* COT */
-    T104Frame_setNextByte((Frame)frame, 0); /* OA */
-    T104Frame_setNextByte((Frame)frame, 0); /* CA LSB */
-    T104Frame_setNextByte((Frame)frame, 0); /* CA MSB */
+    printf("APROFILE: Encrypted ASDU (len=%d, seq=%u)\n", asdu_len, self->local_sequence_number);
+    fflush(stdout);
 
-    SecurityEncryptedData sed = SecurityEncryptedData_create(NULL, 0, nonce, tag, asdu_len, ciphertext);
-    if (!sed) {
-        GLOBAL_FREEMEM(ciphertext);
-        return false;
-    }
-
-    InformationObject_encode((InformationObject)sed, (Frame)frame, NULL, false);
-
-    SecurityEncryptedData_destroy(sed);
+    /* Reset frame and rebuild with encrypted ASDU */
+    printf("APROFILE: Before reset, msgSize=%d\n", Frame_getMsgSize(genericFrame));
+    fflush(stdout);
+    Frame_resetFrame(genericFrame);
+    printf("APROFILE: After reset, msgSize=%d\n", Frame_getMsgSize(genericFrame));
+    fflush(stdout);
+    
+    /* Build encrypted ASDU using frame API */
+    Frame_setNextByte(genericFrame, S_SE_NA_1);  /* Type ID for secure ASDU */
+    Frame_setNextByte(genericFrame, 1);           /* VSQ: 1 element */
+    Frame_setNextByte(genericFrame, CS101_COT_SPONTANEOUS);  /* COT */
+    Frame_setNextByte(genericFrame, 0);           /* OA */
+    Frame_setNextByte(genericFrame, 0);           /* CA LSB */
+    Frame_setNextByte(genericFrame, 0);           /* CA MSB */
+    
+    /* Add SecurityEncryptedData information object */
+    /* IOA (3 bytes) - using 0 */
+    Frame_setNextByte(genericFrame, 0);
+    Frame_setNextByte(genericFrame, 0);
+    Frame_setNextByte(genericFrame, 0);
+    
+    /* Nonce (12 bytes) */
+    Frame_appendBytes(genericFrame, nonce, 12);
+    
+    /* Tag (16 bytes) */
+    Frame_appendBytes(genericFrame, tag, 16);
+    
+    // /* Ciphertext (variable length - no length field, calculated from remaining bytes) */
+    Frame_appendBytes(genericFrame, ciphertext, asdu_len);
+    
+    printf("APROFILE: After building encrypted frame, msgSize=%d\n", Frame_getMsgSize(genericFrame));
+    fflush(stdout);
+    
     GLOBAL_FREEMEM(ciphertext);
+    
+    /* Increment sequence number */
+    self->local_sequence_number++;
 
     return true;
 #else
@@ -234,95 +352,279 @@ AProfileKind
 AProfile_handleInPdu(AProfileContext self, const uint8_t* in, int inSize, const uint8_t** out, int* outSize)
 {
 #if (CONFIG_CS104_APROFILE == 1)
-    if (self->keyExchangeState == KEY_EXCHANGE_AWAIT_REPLY) {
-        struct sCS101_ASDU _asdu;
-        CS101_ASDU asdu = CS101_ASDU_createFromBufferEx(&_asdu, NULL, (uint8_t*)in, inSize);
+    printf("APROFILE: AProfile_handleInPdu called (inSize=%d)\n", inSize);
+    fflush(stdout);
+    
+    /* Handle incoming key exchange messages */
+    struct sCS101_ASDU _asdu;
+    CS101_ASDU asdu = CS101_ASDU_createFromBufferEx(&_asdu, self->parameters, (uint8_t*)in, inSize);
+    
+    printf("APROFILE: ASDU created: %p, TypeID=%d\n", (void*)asdu, asdu ? CS101_ASDU_getTypeID(asdu) : -1);
+    fflush(stdout);
 
-        if (asdu && CS101_ASDU_getTypeID(asdu) == S_RP_NA_1) {
-            printf("APROFILE: Received security ASDU (S_RP_NA_1)\n");
+    if (asdu && CS101_ASDU_getTypeID(asdu) == S_RP_NA_1) {
+        printf("APROFILE: Received security ASDU (S_RP_NA_1), elements=%d\n", 
+               CS101_ASDU_getNumberOfElements(asdu));
+        fflush(stdout);
 
-            int ret;
-            for (int i = 0; i < CS101_ASDU_getNumberOfElements(asdu); i++) {
-                union uInformationObject _io;
-                SecurityPublicKey spk = (SecurityPublicKey)CS101_ASDU_getElementEx(asdu, (InformationObject)&_io, i);
-                if (spk && InformationObject_getObjectAddress((InformationObject)spk) == 65535) {
-                    printf("APROFILE: Found public key IO\n");
+        int ret;
+        for (int i = 0; i < CS101_ASDU_getNumberOfElements(asdu); i++) {
+            union uInformationObject _io;
+            SecurityPublicKey spk = (SecurityPublicKey)CS101_ASDU_getElementEx(asdu, (InformationObject)&_io, i);
+            printf("APROFILE: Element %d: spk=%p, addr=%d\n", i, (void*)spk, 
+                   spk ? InformationObject_getObjectAddress((InformationObject)spk) : -1);
+            fflush(stdout);
+            
+            if (spk && InformationObject_getObjectAddress((InformationObject)spk) == 65535) {
+                /* Extract public key and perform key exchange */
+                const uint8_t* peer_key = SecurityPublicKey_getKeyValue(spk);
+                int peer_key_len = SecurityPublicKey_getKeyLength(spk);
+                printf("APROFILE: Extracted peer key: len=%d\n", peer_key_len);
+                fflush(stdout);
 
-                    /* Extract public key and perform key exchange */
-                    const uint8_t* peer_key = SecurityPublicKey_getKeyValue(spk);
-                    int peer_key_len = SecurityPublicKey_getKeyLength(spk);
-
-                    /* Read peer's public key and compute shared secret using high-level API */
-                    ret = mbedtls_ecdh_read_public(&self->ecdh, peer_key, peer_key_len);
+                /* Ensure the group is loaded */
+                if (self->ecdh.grp.id == MBEDTLS_ECP_DP_NONE) {
+                    ret = mbedtls_ecp_group_load(&self->ecdh.grp, MBEDTLS_ECP_DP_SECP256R1);
                     if (ret != 0) {
-                        printf("APROFILE: Failed to read peer public key (error: -0x%04x)\n", -ret);
+                        printf("APROFILE: Failed to load ECC group (error: -0x%04x)\n", -ret);
                         break;
                     }
                     
-                    /* Compute shared secret */
-                    uint8_t shared_secret[32];
-                    size_t shared_secret_len = sizeof(shared_secret);
-                    ret = mbedtls_ecdh_calc_secret(&self->ecdh, &shared_secret_len, shared_secret, sizeof(shared_secret),
-                                                    mbedtls_ctr_drbg_random, &self->ctr_drbg);
+                    /* Generate our key pair if not done yet */
+                    ret = mbedtls_ecdh_gen_public(&self->ecdh.grp, &self->ecdh.d, &self->ecdh.Q,
+                                                   mbedtls_ctr_drbg_random, &self->ctr_drbg);
                     if (ret != 0) {
-                        printf("APROFILE: Failed to calculate shared secret (error: -0x%04x)\n", -ret);
+                        printf("APROFILE: Failed to generate ECDH key pair (error: -0x%04x)\n", -ret);
                         break;
                     }
-
-                    uint8_t session_key[16];
-                    ret = mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0,
-                                      shared_secret, shared_secret_len,
-                                      (const unsigned char*)"IEC62351-5", 11,
-                                      session_key, sizeof(session_key));
-                    if (ret != 0) {
-                        printf("APROFILE: Failed to derive session key (error: -0x%04x)\n", -ret);
-                        break;
+                    
+                    printf("APROFILE: Key pair generated successfully\n");
+                    fflush(stdout);
+                    
+                    /* If we're the server, send our public key back */
+                    if (!self->isClient) {
+                        printf("APROFILE: Server preparing to send public key response\n");
+                        fflush(stdout);
+                        size_t olen = 0;
+                        ret = mbedtls_ecp_point_write_binary(&self->ecdh.grp, &self->ecdh.Q,
+                                                              MBEDTLS_ECP_PF_UNCOMPRESSED, &olen,
+                                                              self->localPublicKey, sizeof(self->localPublicKey));
+                        if (ret == 0) {
+                            self->localPublicKeyLen = (int)olen;
+                            printf("APROFILE: Server exported public key (len=%d)\n", self->localPublicKeyLen);
+                            fflush(stdout);
+                            
+                            CS101_ASDU response = CS101_ASDU_create(self->parameters, false, CS101_COT_AUTHENTICATION, 0, 0, false, false);
+                            if (response) {
+                                CS101_ASDU_setTypeID(response, S_RP_NA_1);
+                                SecurityPublicKey spk_resp = SecurityPublicKey_create(NULL, 65535, self->localPublicKeyLen, self->localPublicKey);
+                                if (spk_resp) {
+                                    CS101_ASDU_addInformationObject(response, (InformationObject)spk_resp);
+                                    SecurityPublicKey_destroy(spk_resp);
+                                    
+                                    printf("APROFILE: Server calling sendAsdu callback (callback=%p)\n", (void*)self->sendAsdu);
+                                    fflush(stdout);
+                                    if (self->sendAsdu) {
+                                        bool sent = self->sendAsdu(self->connection, response);
+                                        printf("APROFILE: Server sent public key response (result=%d)\n", sent);
+                                        fflush(stdout);
+                                    } else {
+                                        printf("APROFILE: Server sendAsdu callback is NULL!\n");
+                                        fflush(stdout);
+                                    }
+                                    CS101_ASDU_destroy(response);
+                                } else {
+                                    printf("APROFILE: Failed to create SecurityPublicKey for response\n");
+                                    fflush(stdout);
+                                    CS101_ASDU_destroy(response);
+                                }
+                            } else {
+                                printf("APROFILE: Failed to create response ASDU\n");
+                                fflush(stdout);
+                            }
+                        } else {
+                            printf("APROFILE: Failed to export server public key (error: -0x%04x)\n", -ret);
+                            fflush(stdout);
+                        }
                     }
+                }
 
-                    mbedtls_gcm_setkey(&self->gcm_encrypt, MBEDTLS_CIPHER_ID_AES, session_key, 128);
-                    mbedtls_gcm_setkey(&self->gcm_decrypt, MBEDTLS_CIPHER_ID_AES, session_key, 128);
-
-                    self->security_active = true;
-                    self->keyExchangeState = KEY_EXCHANGE_COMPLETE;
-                    printf("APROFILE: Key exchange complete, security is active\n");
-
+                printf("APROFILE: Now reading peer's public key (peer_key=%p, peer_key_len=%d)\n", 
+                       (void*)peer_key, peer_key_len);
+                fflush(stdout);
+                
+                /* Read peer's public key using low-level ECP API */
+                ret = mbedtls_ecp_point_read_binary(&self->ecdh.grp, &self->ecdh.Qp,
+                                                     peer_key, peer_key_len);
+                if (ret != 0) {
+                    printf("APROFILE: Failed to read peer public key (error: -0x%04x)\n", -ret);
+                    fflush(stdout);
                     break;
                 }
+                printf("APROFILE: Peer public key read successfully\n");
+                fflush(stdout);
+                
+                printf("APROFILE: Computing shared secret...\n");
+                fflush(stdout);
+                
+                /* Compute shared secret using low-level ECDH API */
+                ret = mbedtls_ecdh_compute_shared(&self->ecdh.grp, &self->ecdh.z,
+                                                   &self->ecdh.Qp, &self->ecdh.d,
+                                                   mbedtls_ctr_drbg_random, &self->ctr_drbg);
+                if (ret != 0) {
+                    printf("APROFILE: Failed to calculate shared secret (error: -0x%04x)\n", -ret);
+                    fflush(stdout);
+                    break;
+                }
+                printf("APROFILE: Shared secret computed successfully\n");
+                fflush(stdout);
+
+                /* Export shared secret to buffer */
+                uint8_t shared_secret[32];
+                size_t shared_secret_len = mbedtls_mpi_size(&self->ecdh.z);
+                printf("APROFILE: Shared secret length: %zu bytes\n", shared_secret_len);
+                fflush(stdout);
+                
+                if (shared_secret_len > sizeof(shared_secret)) {
+                    printf("APROFILE: Shared secret too large\n");
+                    fflush(stdout);
+                    break;
+                }
+                ret = mbedtls_mpi_write_binary(&self->ecdh.z, shared_secret, shared_secret_len);
+                if (ret != 0) {
+                    printf("APROFILE: Failed to export shared secret (error: -0x%04x)\n", -ret);
+                    fflush(stdout);
+                    break;
+                }
+                printf("APROFILE: Shared secret exported successfully\n");
+                fflush(stdout);
+
+                printf("APROFILE: Deriving session key using HKDF...\n");
+                fflush(stdout);
+                
+                uint8_t session_key[16];
+                ret = mbedtls_hkdf(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), NULL, 0,
+                                  shared_secret, shared_secret_len,
+                                  (const unsigned char*)"IEC62351-5", 11,
+                                  session_key, sizeof(session_key));
+                if (ret != 0) {
+                    printf("APROFILE: Failed to derive session key (error: -0x%04x)\n", -ret);
+                    fflush(stdout);
+                    break;
+                }
+                printf("APROFILE: Session key derived successfully\n");
+                fflush(stdout);
+
+                printf("APROFILE: Setting up GCM encryption contexts...\n");
+                fflush(stdout);
+                
+                mbedtls_gcm_setkey(&self->gcm_encrypt, MBEDTLS_CIPHER_ID_AES, session_key, 128);
+                mbedtls_gcm_setkey(&self->gcm_decrypt, MBEDTLS_CIPHER_ID_AES, session_key, 128);
+
+                self->security_active = true;
+                self->keyExchangeState = KEY_EXCHANGE_COMPLETE;
+                printf("APROFILE: Key exchange complete, security is active\n");
+                fflush(stdout);
+
+                break;
             }
-
-            return APROFILE_CTRL_MSG;
         }
+
+        return APROFILE_CTRL_MSG;
     }
 
-    if (!self->security_active || CS101_ASDU_getTypeID(CS101_ASDU_createFromBufferEx(NULL, NULL, (uint8_t*)in, inSize)) != S_SE_NA_1) {
+    /* Check if security is active and if this is an encrypted ASDU */
+    printf("APROFILE: Checking if decryption needed (security_active=%d, inSize=%d, in[0]=%d, S_SE_NA_1=%d)\n",
+           self->security_active, inSize, inSize > 0 ? in[0] : -1, S_SE_NA_1);
+    fflush(stdout);
+    
+    if (!self->security_active) {
+        printf("APROFILE: Security not active, returning plaintext\n");
+        fflush(stdout);
         *out = in;
         *outSize = inSize;
         return APROFILE_PLAINTEXT;
     }
 
-    /* Check if the incoming message is a secure ASDU */
+    /* Check if the incoming message is a secure ASDU (type S_SE_NA_1) */
     if (inSize < 1 || in[0] != S_SE_NA_1) {
+        printf("APROFILE: Not a secure ASDU (inSize=%d, in[0]=%d), returning plaintext\n", inSize, inSize > 0 ? in[0] : -1);
+        fflush(stdout);
         *out = in;
         *outSize = inSize;
         return APROFILE_PLAINTEXT;
     }
 
-    SecurityEncryptedData sed = SecurityEncryptedData_getFromBuffer(NULL, NULL, (uint8_t*)in + 6, inSize - 6, 0, false);
-    if (!sed) return APROFILE_PLAINTEXT;
+    printf("APROFILE: Decrypting secure ASDU...\n");
+    fflush(stdout);
 
-    *outSize = SecurityEncryptedData_getCiphertextLength(sed);
+    /* Parse the SecurityEncryptedData information object */
+    printf("APROFILE: Parsing SecurityEncryptedData (inSize=%d, offset=6)...\n", inSize);
+    fflush(stdout);
+    SecurityEncryptedData sed = SecurityEncryptedData_getFromBuffer(NULL, self->parameters, (uint8_t*)in + 6, inSize - 6, 0, false);
+    if (!sed) {
+        printf("APROFILE: Failed to parse SecurityEncryptedData\n");
+        fflush(stdout);
+        *out = in;
+        *outSize = inSize;
+        return APROFILE_PLAINTEXT;
+    }
+    printf("APROFILE: SecurityEncryptedData parsed successfully\n");
+    fflush(stdout);
+
+    const uint8_t* nonce = SecurityEncryptedData_getNonce(sed);
+    const uint8_t* tag = SecurityEncryptedData_getTag(sed);
+    const uint8_t* ciphertext = SecurityEncryptedData_getCiphertext(sed);
+    int ciphertext_len = SecurityEncryptedData_getCiphertextLength(sed);
+    
+    printf("APROFILE: Extracted: ciphertext_len=%d\n", ciphertext_len);
+    fflush(stdout);
+
+    /* Extract sequence number from nonce (first 4 bytes) for replay protection */
+    uint32_t received_seq;
+    memcpy(&received_seq, nonce, 4);
+
+    /* Verify sequence number to prevent replay attacks */
+    /* Note: For the first message, remote_sequence_number is 0, so we accept seq=0 */
+    if (self->remote_sequence_number != 0 && received_seq <= self->remote_sequence_number) {
+        printf("APROFILE: Replay attack detected! Received seq=%u, expected >%u\n", 
+               received_seq, self->remote_sequence_number);
+        fflush(stdout);
+        SecurityEncryptedData_destroy(sed);
+        *out = NULL;
+        *outSize = 0;
+        return APROFILE_PLAINTEXT;
+    }
+
+    /* Allocate buffer for decrypted plaintext */
+    *outSize = ciphertext_len;
     *out = (const uint8_t*)GLOBAL_MALLOC(*outSize);
+    if (!*out) {
+        printf("APROFILE: Failed to allocate memory for decryption\n");
+        SecurityEncryptedData_destroy(sed);
+        *outSize = 0;
+        return APROFILE_PLAINTEXT;
+    }
 
-    int ret = mbedtls_gcm_auth_decrypt(&self->gcm_decrypt, *outSize, SecurityEncryptedData_getNonce(sed), 12, NULL, 0, SecurityEncryptedData_getTag(sed), 16, SecurityEncryptedData_getCiphertext(sed), (uint8_t*)*out);
+    /* Decrypt and authenticate using AES-GCM */
+    int ret = mbedtls_gcm_auth_decrypt(&self->gcm_decrypt, ciphertext_len, 
+                                       nonce, 12, NULL, 0, 
+                                       tag, 16, ciphertext, (uint8_t*)*out);
+
     SecurityEncryptedData_destroy(sed);
 
     if (ret != 0) {
-        printf("APROFILE: Failed to decrypt or authenticate ASDU\n");
+        printf("APROFILE: Decryption or authentication failed (error: -0x%04x)\n", -ret);
         GLOBAL_FREEMEM((void*)*out);
         *out = NULL;
         *outSize = 0;
         return APROFILE_PLAINTEXT;
     }
+
+    /* Update sequence number after successful decryption */
+    self->remote_sequence_number = received_seq;
+    
+    printf("APROFILE: Successfully decrypted ASDU (len=%d, seq=%u)\n", ciphertext_len, received_seq);
 
     return APROFILE_SECURE_DATA;
 #else

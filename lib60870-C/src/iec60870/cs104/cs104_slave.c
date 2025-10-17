@@ -1796,7 +1796,8 @@ CS104_Slave_setRawMessageHandler(CS104_Slave self, CS104_SlaveRawMessageHandler 
 static bool
 cs104Server_sendAsdu(void* connection, CS101_ASDU asdu)
 {
-    return sendASDUInternal((MasterConnection)connection, asdu);
+    MasterConnection self = (MasterConnection)connection;
+    return sendASDUInternal(self, asdu);
 }
 #endif
 
@@ -1806,12 +1807,7 @@ CS104_Slave_setSecurityConfig(CS104_Slave self, const CS104_SecurityConfig* sec,
                               const CS104_CertConfig* cert, const CS104_RoleConfig* role)
 {
     self->securityConfigured = true;
-
-    for (int i = 0; i < CONFIG_CS104_MAX_CLIENT_CONNECTIONS; i++)
-    {
-        if (self->masterConnections[i] && self->masterConnections[i]->sec == NULL)
-            self->masterConnections[i]->sec = AProfile_create(self->masterConnections[i], cs104Server_sendAsdu);
-    }
+    /* AProfile contexts will be created in MasterConnection_init when connections are established */
 }
 #else
 void
@@ -2054,14 +2050,22 @@ sendASDUInternal(MasterConnection self, CS101_ASDU asdu)
 {
     bool asduSent;
 
+    printf("APROFILE: sendASDUInternal called, TypeID=%d\n", CS101_ASDU_getTypeID(asdu));
+    fflush(stdout);
+
     if (MasterConnection_isActive(self))
     {
+        printf("APROFILE: Connection is active\n");
+        fflush(stdout);
+
 #if (CONFIG_USE_SEMAPHORES == 1)
         Semaphore_wait(self->sentASDUsLock);
 #endif
 
         if (isSentBufferFull(self) == false)
         {
+            printf("APROFILE: Buffer not full, encoding ASDU\n");
+            fflush(stdout);
 
             FrameBuffer frameBuffer;
 
@@ -2070,14 +2074,28 @@ sendASDUInternal(MasterConnection self, CS101_ASDU asdu)
             Frame frame = BufferFrame_initialize(&bufferFrame, frameBuffer.msg, IEC60870_5_104_APCI_LENGTH);
             CS101_ASDU_encode(asdu, frame);
 
+            printf("APROFILE: ASDU encoded, msgSize=%d\n", Frame_getMsgSize(frame));
+            fflush(stdout);
+
             #if (CONFIG_CS104_APROFILE == 1)
-            if (self->sec && AProfile_ready(self->sec))
+            if (self->sec && AProfile_ready(self->sec)) {
+                printf("APROFILE: Encrypting ASDU\n");
+                fflush(stdout);
                 AProfile_wrapOutAsdu(self->sec, (T104Frame)frame);
+                printf("APROFILE: ASDU encrypted, new msgSize=%d\n", Frame_getMsgSize(frame));
+                fflush(stdout);
+            }
             #endif
 
             frameBuffer.msgSize = Frame_getMsgSize(frame);
 
+            printf("APROFILE: Calling sendASDU with msgSize=%d\n", frameBuffer.msgSize);
+            fflush(stdout);
+
             sendASDU(self, frameBuffer.msg, frameBuffer.msgSize, 0, NULL);
+
+            printf("APROFILE: sendASDU completed\n");
+            fflush(stdout);
 
 #if (CONFIG_USE_SEMAPHORES == 1)
             Semaphore_post(self->sentASDUsLock);
@@ -2087,17 +2105,26 @@ sendASDUInternal(MasterConnection self, CS101_ASDU asdu)
         }
         else
         {
+            printf("APROFILE: Buffer full, enqueueing ASDU\n");
+            fflush(stdout);
+
 #if (CONFIG_USE_SEMAPHORES == 1)
             Semaphore_post(self->sentASDUsLock);
 #endif
             asduSent = HighPriorityASDUQueue_enqueue(self->highPrioQueue, asdu);
         }
     }
-    else
+    else {
+        printf("APROFILE: Connection not active\n");
+        fflush(stdout);
         asduSent = false;
+    }
 
     if (asduSent == false)
         DEBUG_PRINT("CS104 SLAVE: unable to send response (state=%i)\n", self->state);
+
+    printf("APROFILE: sendASDUInternal returning %d\n", asduSent);
+    fflush(stdout);
 
     return asduSent;
 }
@@ -2970,10 +2997,21 @@ handleMessage(MasterConnection self, uint8_t* buffer, int msgSize)
                  */
                 if (self->sec)
                 {
+                    printf("APROFILE: Server calling AProfile_handleInPdu\n");
+                    fflush(stdout);
                     AProfileKind kind =
                         AProfile_handleInPdu(self->sec, buffer + 6, msgSize - 6, &asduBuf, &asduLen);
                     if (kind == APROFILE_CTRL_MSG)
+                    {
+                        printf("APROFILE: Server processed control message\n");
+                        fflush(stdout);
                         return true;
+                    }
+                }
+                else
+                {
+                    printf("APROFILE: Server sec is NULL - cannot handle security\n");
+                    fflush(stdout);
                 }
 #endif
 
@@ -2982,9 +3020,16 @@ handleMessage(MasterConnection self, uint8_t* buffer, int msgSize)
                 CS101_ASDU asdu =
                     CS101_ASDU_createFromBufferEx(&_asdu, &(self->slave->alParameters), (uint8_t*)asduBuf, asduLen);
 
+                printf("APROFILE: Server parsed ASDU: %p, TypeID=%d\n", (void*)asdu, asdu ? CS101_ASDU_getTypeID(asdu) : -1);
+                fflush(stdout);
+
                 if (asdu)
                 {
+                    printf("APROFILE: Server calling handleASDU\n");
+                    fflush(stdout);
                     bool validAsdu = handleASDU(self, asdu);
+                    printf("APROFILE: Server handleASDU returned: %d\n", validAsdu);
+                    fflush(stdout);
 
                     if (validAsdu == false)
                     {
@@ -3803,6 +3848,35 @@ MasterConnection_init(MasterConnection self, Socket skt, MessageQueue lowPrioQue
 
         self->waitingForTestFRcon = false;
 
+#if (CONFIG_CS104_APROFILE == 1)
+        /* Create AProfile context if security is configured and not already created */
+        printf("APROFILE: MasterConnection_init - securityConfigured=%d, sec=%p\n", 
+               self->slave->securityConfigured, (void*)self->sec);
+        fflush(stdout);
+        
+        if (self->slave->securityConfigured && self->sec == NULL)
+        {
+            printf("APROFILE: Creating server AProfile context for new connection\n");
+            fflush(stdout);
+            self->sec = AProfile_create(self, cs104Server_sendAsdu, &(self->slave->alParameters), false); /* false = server */
+            if (self->sec == NULL)
+            {
+                DEBUG_PRINT("CS104 SLAVE: Failed to create AProfile context for new connection\n");
+            }
+            else
+            {
+                printf("APROFILE: Server AProfile context created successfully (sec=%p)\n", (void*)self->sec);
+                fflush(stdout);
+            }
+        }
+        else
+        {
+            printf("APROFILE: NOT creating AProfile context (securityConfigured=%d, sec=%p)\n",
+                   self->slave->securityConfigured, (void*)self->sec);
+            fflush(stdout);
+        }
+#endif
+
         return true;
     }
     else
@@ -3857,6 +3931,14 @@ MasterConnection_close(MasterConnection self)
 
     self->isRunning = false;
     self->state = M_CON_STATE_STOPPED;
+
+#if (CONFIG_CS104_APROFILE == 1)
+    /* Clean up AProfile context when connection closes */
+    if (self->sec) {
+        AProfile_destroy(self->sec);
+        self->sec = NULL;
+    }
+#endif
 
 #if (CONFIG_USE_SEMAPHORES == 1)
     Semaphore_post(self->stateLock);
