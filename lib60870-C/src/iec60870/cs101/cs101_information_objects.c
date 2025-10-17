@@ -8222,19 +8222,11 @@ SecurityPublicKey_getFromBuffer(SecurityPublicKey self, CS101_AppLayerParameters
 
         if (!isSequence)
         {
-            printf("APROFILE: SecurityPublicKey_getFromBuffer - parsing IOA from buffer at startIndex=%d, sizeOfIOA=%d\n", startIndex, parameters->sizeOfIOA);
-            printf("APROFILE: Buffer bytes: [0]=%02x [1]=%02x [2]=%02x [3]=%02x\n", msg[0], msg[1], msg[2], msg[3]);
-            fflush(stdout);
-            
             InformationObject_getFromBuffer((InformationObject)self, parameters, msg, startIndex);
             if (self == NULL) {
                 DEBUG_PRINT("InformationObject_getFromBuffer returned NULL\n");
                 return NULL;
             }
-            
-            printf("APROFILE: Parsed IOA=%d\n", self->objectAddress);
-            fflush(stdout);
-            
             startIndex += parameters->sizeOfIOA;
         }
 
